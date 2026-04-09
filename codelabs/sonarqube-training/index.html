@@ -76,7 +76,7 @@
 </td><td colspan="1" rowspan="1"><p>Value</p>
 </td></tr>
 <tr><td colspan="1" rowspan="1"><p><strong>URL</strong></p>
-</td><td colspan="1" rowspan="1"><p><code>http://sonar-training.duckdns.org</code></p>
+</td><td colspan="1" rowspan="1"><p><code>http://sonarqube-training.duckdns.org</code></p>
 </td></tr>
 <tr><td colspan="1" rowspan="1"><p><strong>Username</strong></p>
 </td><td colspan="1" rowspan="1"><p>akan diberikan saat workshop</p>
@@ -837,7 +837,7 @@ Java XX.X.X ...
 </aside>
 <h2 is-upgraded>Step 3: Akses SonarQube Server</h2>
 <ol type="1">
-<li>Buka browser, navigasi ke: <code>http://sonar-training.duckdns.org</code></li>
+<li>Buka browser, navigasi ke: <code>http://sonarqube-training.duckdns.org</code></li>
 <li>Login dengan credential yang diberikan trainer</li>
 <li><strong>Ganti password</strong> jika diminta</li>
 </ol>
@@ -875,7 +875,7 @@ Java XX.X.X ...
 <pre><code language="language-json" class="language-json">{
   &#34;sonarlint.connectedMode.connections.sonarqube&#34;: [
     {
-      &#34;serverUrl&#34;: &#34;http://sonar-training.duckdns.org&#34;,
+      &#34;serverUrl&#34;: &#34;http://sonarqube-training.duckdns.org&#34;,
       &#34;token&#34;: &#34;YOUR_TOKEN_HERE&#34;
     }
   ]
@@ -931,7 +931,7 @@ Java XX.X.X ...
 </td><td colspan="1" rowspan="1"><p>Perintah <code>sonar-scanner --version</code> berhasil di terminal</p>
 </td></tr>
 <tr><td colspan="1" rowspan="1"><p><strong>Akses server</strong></p>
-</td><td colspan="1" rowspan="1"><p>Bisa login ke <code>http://sonar-training.duckdns.org</code></p>
+</td><td colspan="1" rowspan="1"><p>Bisa login ke <code>http://sonarqube-training.duckdns.org</code></p>
 </td></tr>
 <tr><td colspan="1" rowspan="1"><p><strong>Connected Mode</strong></p>
 </td><td colspan="1" rowspan="1"><p>SonarQube for IDE sudah terhubung ke server</p>
@@ -1011,7 +1011,7 @@ npm install
 <pre><code language="language-properties" class="language-properties">sonar.projectKey=YOUR_PROJECT_KEY
 sonar.projectName=YOUR_PROJECT_NAME
 sonar.sources=src
-sonar.host.url=http://sonar-training.duckdns.org
+sonar.host.url=http://sonarqube-training.duckdns.org
 sonar.login=YOUR_PROJECT_TOKEN_HERE
 
 # TypeScript specific
@@ -1022,7 +1022,7 @@ sonar.exclusions=**/node_modules/**,**/dist/**
 <pre><code language="language-properties" class="language-properties">sonar.projectKey=inventory-bagas
 sonar.projectName=Aplikasi Inventory Bagas
 sonar.sources=src
-sonar.host.url=http://sonar-training.duckdns.org
+sonar.host.url=http://sonarqube-training.duckdns.org
 sonar.login=sqp_xxxxxxxxxxxxxxxxxxxx
 
 # TypeScript specific
@@ -1036,7 +1036,7 @@ sonar.exclusions=**/node_modules/**,**/dist/**
 <li><code>sonar.login</code> diisi dengan <strong>token project</strong> yang baru saja di-generate pada langkah sebelumnya</li>
 </ul>
 <aside class="special"><p><strong>Lupa project key?</strong> Buka project Anda di SonarQube, lalu lihat URL di browser. Project key ada di parameter <code>id=</code>, contoh:</p>
-<pre><code>http://sonar-training.duckdns.org/dashboard?id=inventory-bagas
+<pre><code>http://sonarqube-training.duckdns.org/dashboard?id=inventory-bagas
 </code></pre>
 <p>Nilai <code>inventory-bagas</code> itulah yang dipakai sebagai <code>sonar.projectKey</code>.</p>
 </aside>
@@ -1518,7 +1518,7 @@ CI/CD + Sonar:   Push code → otomatis scan → block merge jika gagal
 </td><td colspan="1" rowspan="1"><p>Token dari Step 1</p>
 </td></tr>
 <tr><td colspan="1" rowspan="1"><p><code>SONAR_HOST_URL</code></p>
-</td><td colspan="1" rowspan="1"><p><code>http://sonar-training.duckdns.org</code></p>
+</td><td colspan="1" rowspan="1"><p><code>http://sonarqube-training.duckdns.org</code></p>
 </td></tr>
 </table>
 <h3 is-upgraded>Step 3: Buat Workflow File</h3>
@@ -1950,7 +1950,7 @@ Recommendation:
 <pre><code language="language-properties" class="language-properties">sonar.projectKey=[nama]-real-project
 sonar.projectName=[NAMA] Real Project
 sonar.sources=src
-sonar.host.url=http://sonar-training.duckdns.org
+sonar.host.url=http://sonarqube-training.duckdns.org
 sonar.token=YOUR_TOKEN
 sonar.exclusions=**/node_modules/**,**/dist/**,**/build/**
 </code></pre>

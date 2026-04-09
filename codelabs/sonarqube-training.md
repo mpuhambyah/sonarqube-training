@@ -93,7 +93,7 @@ SonarQube server sudah disiapkan. Anda tidak perlu install server sendiri - cuku
 
 | Info | Value |
 |------|-------|
-| **URL** | `http://sonar-training.duckdns.org` |
+| **URL** | `http://sonarqube-training.duckdns.org` |
 | **Username** | akan diberikan saat workshop |
 | **Password** | akan diberikan saat workshop |
 
@@ -771,7 +771,7 @@ Java XX.X.X ...
 
 ### Step 3: Akses SonarQube Server
 
-1. Buka browser, navigasi ke: `http://sonar-training.duckdns.org`
+1. Buka browser, navigasi ke: `http://sonarqube-training.duckdns.org`
 2. Login dengan credential yang diberikan trainer
 3. **Ganti password** jika diminta
 
@@ -803,7 +803,7 @@ Agar SonarQube for IDE di VS Code sinkron dengan rules di server:
 {
   "sonarlint.connectedMode.connections.sonarqube": [
     {
-      "serverUrl": "http://sonar-training.duckdns.org",
+      "serverUrl": "http://sonarqube-training.duckdns.org",
       "token": "YOUR_TOKEN_HERE"
     }
   ]
@@ -843,7 +843,7 @@ Pastikan semua sudah ready sebelum lanjut:
 |------------|--------|
 | **SonarQube for IDE** | Extension sudah terinstall di VS Code |
 | **SonarScanner** | Perintah `sonar-scanner --version` berhasil di terminal |
-| **Akses server** | Bisa login ke `http://sonar-training.duckdns.org` |
+| **Akses server** | Bisa login ke `http://sonarqube-training.duckdns.org` |
 | **Connected Mode** | SonarQube for IDE sudah terhubung ke server |
 
 > aside positive
@@ -934,7 +934,7 @@ Buat file `sonar-project.properties` di root project. Ganti nilai sesuai dengan 
 sonar.projectKey=YOUR_PROJECT_KEY
 sonar.projectName=YOUR_PROJECT_NAME
 sonar.sources=src
-sonar.host.url=http://sonar-training.duckdns.org
+sonar.host.url=http://sonarqube-training.duckdns.org
 sonar.login=YOUR_PROJECT_TOKEN_HERE
 
 # TypeScript specific
@@ -948,7 +948,7 @@ sonar.exclusions=**/node_modules/**,**/dist/**
 sonar.projectKey=inventory-bagas
 sonar.projectName=Aplikasi Inventory Bagas
 sonar.sources=src
-sonar.host.url=http://sonar-training.duckdns.org
+sonar.host.url=http://sonarqube-training.duckdns.org
 sonar.login=sqp_xxxxxxxxxxxxxxxxxxxx
 
 # TypeScript specific
@@ -965,7 +965,7 @@ Penjelasan mapping-nya:
 > aside positive
 > **Lupa project key?** Buka project Anda di SonarQube, lalu lihat URL di browser. Project key ada di parameter `id=`, contoh:
 > ```
-> http://sonar-training.duckdns.org/dashboard?id=inventory-bagas
+> http://sonarqube-training.duckdns.org/dashboard?id=inventory-bagas
 > ```
 > Nilai `inventory-bagas` itulah yang dipakai sebagai `sonar.projectKey`.
 
@@ -1342,7 +1342,7 @@ Di repo GitHub → **Settings** → **Secrets and variables** → **Actions**:
 | Secret Name | Value |
 |-------------|-------|
 | `SONAR_TOKEN` | Token dari Step 1 |
-| `SONAR_HOST_URL` | `http://sonar-training.duckdns.org` |
+| `SONAR_HOST_URL` | `http://sonarqube-training.duckdns.org` |
 
 #### Step 3: Buat Workflow File
 
@@ -1732,7 +1732,7 @@ Anda adalah Tech Lead di perusahaan. Management meminta Anda untuk:
 sonar.projectKey=[nama]-real-project
 sonar.projectName=[NAMA] Real Project
 sonar.sources=src
-sonar.host.url=http://sonar-training.duckdns.org
+sonar.host.url=http://sonarqube-training.duckdns.org
 sonar.token=YOUR_TOKEN
 sonar.exclusions=**/node_modules/**,**/dist/**,**/build/**
 ```
