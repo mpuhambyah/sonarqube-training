@@ -23,6 +23,9 @@ jobs:
       - name: Install mermaid-cli
         run: npm install -g @mermaid-js/mermaid-cli
 
+      - name: Create puppeteer config
+        run: echo '{"args":["--no-sandbox","--disable-setuid-sandbox"]}' > /tmp/puppeteer-config.json
+
       - name: Install claat
         run: |
           curl -L https://github.com/googlecodelabs/tools/releases/latest/download/claat-linux-amd64 -o /usr/local/bin/claat
@@ -31,13 +34,13 @@ jobs:
       - name: Generate Mermaid diagrams
         working-directory: codelabs
         run: |
-          mmdc -i diagrams/architecture.mmd   -o img/architecture.png   -b white
-          mmdc -i diagrams/scan-flow.mmd      -o img/scan-flow.png      -b white
-          mmdc -i diagrams/cicd-flow.mmd      -o img/cicd-flow.png      -b white
-          mmdc -i diagrams/triage-flow.mmd    -o img/triage-flow.png    -b white
-          mmdc -i diagrams/workshop-setup.mmd -o img/workshop-setup.png -b white
-          mmdc -i diagrams/roadmap.mmd        -o img/roadmap.png        -b white
-          mmdc -i diagrams/devsecops-flow.mmd -o img/devsecops-flow.png -b white -w 1400
+          mmdc -p /tmp/puppeteer-config.json -i diagrams/architecture.mmd   -o img/architecture.png   -b white
+          mmdc -p /tmp/puppeteer-config.json -i diagrams/scan-flow.mmd      -o img/scan-flow.png      -b white
+          mmdc -p /tmp/puppeteer-config.json -i diagrams/cicd-flow.mmd      -o img/cicd-flow.png      -b white
+          mmdc -p /tmp/puppeteer-config.json -i diagrams/triage-flow.mmd    -o img/triage-flow.png    -b white
+          mmdc -p /tmp/puppeteer-config.json -i diagrams/workshop-setup.mmd -o img/workshop-setup.png -b white
+          mmdc -p /tmp/puppeteer-config.json -i diagrams/roadmap.mmd        -o img/roadmap.png        -b white
+          mmdc -p /tmp/puppeteer-config.json -i diagrams/devsecops-flow.mmd -o img/devsecops-flow.png -b white -w 1400
 
       - name: Export Codelab HTML
         working-directory: codelabs
