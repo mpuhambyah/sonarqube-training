@@ -1,0 +1,29 @@
+graph LR
+    subgraph Developer Laptop
+        Scanner[Sonar Scanner]
+        SonarLint[SonarLint - IDE Plugin]
+    end
+
+    subgraph SonarQube Server
+        Web[Web Server - UI + API]
+        CE[Compute Engine]
+        ES[Search - Elasticsearch]
+    end
+
+    subgraph Database
+        DB[(PostgreSQL)]
+    end
+
+    Scanner -->|scan report| Web
+    SonarLint -.->|connected mode| Web
+    Web --> CE
+    CE --> DB
+    ES --> DB
+    Web --> ES
+
+    style Scanner fill:#4CAF50,color:#fff
+    style SonarLint fill:#2196F3,color:#fff
+    style Web fill:#FF9800,color:#fff
+    style CE fill:#FF9800,color:#fff
+    style ES fill:#FF9800,color:#fff
+    style DB fill:#9C27B0,color:#fff

@@ -1,0 +1,29 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2026-04-09T18:53:55+07:00",
+  "id": "sonarqube-training",
+  "duration": 230,
+  "title": "SonarQube Training Workshop",
+  "authors": "Training Team",
+  "summary": "Workshop hands-on SonarQube - dari instalasi sampai integrasi CI/CD. Pelajari cara meningkatkan kualitas kode dan keamanan aplikasi menggunakan SonarQube.",
+  "source": "sonarqube-training.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "devsecops"
+  ],
+  "tags": [
+    "code-quality",
+    "devsecops",
+    "sast",
+    "sonarqube",
+    "web"
+  ],
+  "feedback": "https://github.com/your-repo/issues",
+  "url": "sonarqube-training"
+}

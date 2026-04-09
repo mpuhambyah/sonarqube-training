@@ -1,0 +1,18 @@
+sequenceDiagram
+    participant Dev as Developer
+    participant GH as GitHub
+    participant CI as GitHub Actions
+    participant SQ as SonarQube Server
+
+    Dev->>GH: git push / create PR
+    GH->>CI: Trigger workflow
+    CI->>CI: 1. Build
+    CI->>CI: 2. Run Tests
+    CI->>SQ: 3. SonarScanner sends code
+    SQ->>SQ: 4. Analyze (rules, metrics)
+    SQ-->>CI: 5. Quality Gate result
+    CI->>CI: 6. Check: PASS or FAIL?
+    CI-->>GH: 7. Update PR status
+    
+    Note over Dev,GH: ✅ PASS → can merge
+    Note over Dev,GH: ❌ FAIL → blocked

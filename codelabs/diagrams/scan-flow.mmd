@@ -1,0 +1,19 @@
+flowchart TD
+    A[1. Developer push code] --> B[2. SonarScanner membaca source code]
+    B --> C[3. Scanner mengirim data ke SonarQube Server]
+    C --> D[4. Compute Engine menganalisis - rules + metrics]
+    D --> E[5. Hasil disimpan ke Database]
+    E --> F[6. Dashboard menampilkan report]
+    F --> G{7. Quality Gate}
+    G -->|Memenuhi threshold| H[✅ PASS]
+    G -->|Tidak memenuhi| I[❌ FAIL]
+
+    style A fill:#E3F2FD,color:#333
+    style B fill:#E3F2FD,color:#333
+    style C fill:#E3F2FD,color:#333
+    style D fill:#FFF3E0,color:#333
+    style E fill:#FFF3E0,color:#333
+    style F fill:#FFF3E0,color:#333
+    style G fill:#F3E5F5,color:#333
+    style H fill:#C8E6C9,color:#333
+    style I fill:#FFCDD2,color:#333

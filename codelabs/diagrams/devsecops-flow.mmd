@@ -1,0 +1,69 @@
+flowchart TD
+    %% === TAHAP 1: Developer & Code ===
+    subgraph DEV_ZONE["1 - Developer"]
+        direction LR
+        DEV(["Developer"])
+        LANG["React Native, CSS, JS, HTML5\nDart, Java, TypeScript, Ruby, Docker"]
+    end
+
+    %% === TAHAP 2: Version Control ===
+    subgraph VCS_ZONE["2 - Version Control"]
+        GH["GitHub"]
+    end
+
+    %% === TAHAP 3: CI/CD ===
+    subgraph CICD_ZONE["3 - CI/CD Pipeline"]
+        JK["Jenkins"]
+    end
+
+    %% === TAHAP 4: SAST ===
+    subgraph SAST_ZONE["4 - Security Analysis"]
+        SQ["SonarQube SAST"]
+    end
+
+    %% === TAHAP 5: Notifikasi ===
+    subgraph NOTIFY_ZONE["5 - Notification"]
+        direction LR
+        JIRA["Jira Ticket"]
+        EMAIL["Email Notification"]
+    end
+
+    %% === TAHAP 6: Review ===
+    subgraph REVIEW_ZONE["6 - Security Review"]
+        direction LR
+        EU["End User / Assignee"]
+        CYBER["Cybersecurity Team"]
+    end
+
+    %% === Flow utama (atas ke bawah) ===
+    LANG --> DEV
+    DEV -->|Push Code| GH
+    GH -->|Auto Pull Source Code| JK
+    JK -->|Scan Project| SQ
+
+    %% === Notifikasi (2 jalur) ===
+    SQ -->|Create Ticket| JIRA
+    SQ -->|Send Email| EMAIL
+    JIRA --> EU
+    EMAIL --> EU
+
+    %% === Review & Feedback Loop ===
+    EU -->|Review Meeting\nvia Teams setiap Selasa| CYBER
+    CYBER -->|Kirim Laporan Temuan\nvia Email| DEV
+
+    %% === Styles ===
+    style DEV fill:#DBEAFE,color:#1e3a5f,stroke:#3B82F6
+    style LANG fill:#F0F9FF,color:#0c4a6e,stroke:#38BDF8
+    style GH fill:#F3F4F6,color:#111827,stroke:#6B7280
+    style JK fill:#FEF3C7,color:#78350f,stroke:#F59E0B
+    style SQ fill:#DCFCE7,color:#14532d,stroke:#22C55E
+    style JIRA fill:#EDE9FE,color:#3b0764,stroke:#8B5CF6
+    style EMAIL fill:#EDE9FE,color:#3b0764,stroke:#8B5CF6
+    style EU fill:#FEE2E2,color:#7f1d1d,stroke:#EF4444
+    style CYBER fill:#FEE2E2,color:#7f1d1d,stroke:#EF4444
+    style DEV_ZONE fill:#EFF6FF,color:#1e40af,stroke:#93C5FD
+    style VCS_ZONE fill:#F9FAFB,color:#111827,stroke:#9CA3AF
+    style CICD_ZONE fill:#FFFBEB,color:#451a03,stroke:#F59E0B
+    style SAST_ZONE fill:#F0FDF4,color:#052e16,stroke:#22C55E
+    style NOTIFY_ZONE fill:#F5F3FF,color:#2e1065,stroke:#8B5CF6
+    style REVIEW_ZONE fill:#FFF1F2,color:#4c0519,stroke:#F43F5E

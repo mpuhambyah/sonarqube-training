@@ -1,0 +1,49 @@
+flowchart TD
+    subgraph Bulan1["📅 Bulan 1 — Setup"]
+        direction LR
+        A1[Install SonarQube\nvia Docker] --- A2[Scan 2-3\nproject utama] --- A3[Training\ndeveloper] --- A4["Quality Gate:\nSonar Way (soft)"]
+    end
+
+    subgraph Bulan2["📅 Bulan 2 — Integration"]
+        direction LR
+        B1[Integrate CI/CD\nsemua repo] --- B2[Custom\nQuality Gate] --- B3[Fix critical\nvulnerabilities] --- B4[Weekly\nquality review]
+    end
+
+    subgraph Bulan3["📅 Bulan 3 — Enforcement"]
+        direction LR
+        C1[Block merge\njika gate fail] --- C2[Coverage\nrequirement aktif] --- C3[Monthly report\nke management] --- C4[SonarQube for IDE\ndi semua IDE]
+    end
+
+    subgraph Bulan6["📅 Bulan 6+ — Maturity"]
+        direction LR
+        D1[Full DevSecOps\npipeline] --- D2[Portfolio\ntracking] --- D3[Company-wide\ncoding standard] --- D4[Continuous\nimprovement]
+    end
+
+    Bulan1 --> Bulan2
+    Bulan2 --> Bulan3
+    Bulan3 --> Bulan6
+
+    style Bulan1 fill:#C8E6C9,color:#1b5e20,stroke:#4CAF50
+    style Bulan2 fill:#BBDEFB,color:#0d47a1,stroke:#2196F3
+    style Bulan3 fill:#FFE0B2,color:#e65100,stroke:#FF9800
+    style Bulan6 fill:#E1BEE7,color:#4a148c,stroke:#9C27B0
+
+    style A1 fill:#fff,color:#1b5e20,stroke:#4CAF50
+    style A2 fill:#fff,color:#1b5e20,stroke:#4CAF50
+    style A3 fill:#fff,color:#1b5e20,stroke:#4CAF50
+    style A4 fill:#fff,color:#1b5e20,stroke:#4CAF50
+
+    style B1 fill:#fff,color:#0d47a1,stroke:#2196F3
+    style B2 fill:#fff,color:#0d47a1,stroke:#2196F3
+    style B3 fill:#fff,color:#0d47a1,stroke:#2196F3
+    style B4 fill:#fff,color:#0d47a1,stroke:#2196F3
+
+    style C1 fill:#fff,color:#e65100,stroke:#FF9800
+    style C2 fill:#fff,color:#e65100,stroke:#FF9800
+    style C3 fill:#fff,color:#e65100,stroke:#FF9800
+    style C4 fill:#fff,color:#e65100,stroke:#FF9800
+
+    style D1 fill:#fff,color:#4a148c,stroke:#9C27B0
+    style D2 fill:#fff,color:#4a148c,stroke:#9C27B0
+    style D3 fill:#fff,color:#4a148c,stroke:#9C27B0
+    style D4 fill:#fff,color:#4a148c,stroke:#9C27B0

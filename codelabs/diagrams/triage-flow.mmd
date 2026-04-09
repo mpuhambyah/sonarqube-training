@@ -1,0 +1,15 @@
+flowchart TD
+    A[Security Hotspot Ditemukan] --> B[Status: To Review]
+    B --> C[Acknowledged - sudah dilihat]
+    C --> D{Review}
+    D -->|Aman setelah ditinjau| E[✅ Safe - Dismiss]
+    D -->|Berbahaya| F[❌ Not Safe]
+    F --> G[Fixed]
+
+    style A fill:#FFF3E0,color:#333
+    style B fill:#E3F2FD,color:#333
+    style C fill:#E3F2FD,color:#333
+    style D fill:#F3E5F5,color:#333
+    style E fill:#C8E6C9,color:#333
+    style F fill:#FFCDD2,color:#333
+    style G fill:#C8E6C9,color:#333
