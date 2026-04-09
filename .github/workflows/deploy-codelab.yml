@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'codelabs/**'
+      - 'nginx/**'
   workflow_dispatch: # manual trigger
 
 jobs:
@@ -61,3 +62,23 @@ jobs:
           remote_host: 103.30.194.60
           remote_user: mpuhambyah
           remote_key: ${{ secrets.VPS_SSH_KEY }}
+
+      - name: Deploy nginx config
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: 103.30.194.60
+          username: mpuhambyah
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: nginx/sonarqube-training.conf
+          target: /tmp/
+
+      - name: Apply nginx config
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 103.30.194.60
+          username: mpuhambyah
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            sudo cp /tmp/nginx/sonarqube-training.conf /etc/nginx/sites-available/sonarqube-training
+            sudo ln -sf /etc/nginx/sites-available/sonarqube-training /etc/nginx/sites-enabled/sonarqube-training
+            sudo nginx -t && sudo systemctl reload nginx
