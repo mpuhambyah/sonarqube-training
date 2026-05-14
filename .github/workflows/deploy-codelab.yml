@@ -82,3 +82,14 @@ jobs:
             sudo cp /tmp/nginx/sonarqube-training.conf /etc/nginx/sites-available/sonarqube-training
             sudo ln -sf /etc/nginx/sites-available/sonarqube-training /etc/nginx/sites-enabled/sonarqube-training
             sudo nginx -t && sudo systemctl reload nginx
+
+      - name: Configure SonarQube web context
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 103.134.154.8
+          username: mpuhambyah
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            grep -q "^sonar.web.context=" /opt/sonarqube/conf/sonar.properties || \
+              echo "sonar.web.context=/sonarqube" | sudo tee -a /opt/sonarqube/conf/sonar.properties
+            sudo systemctl restart sonarqube
